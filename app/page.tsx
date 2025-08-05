@@ -561,19 +561,19 @@ export default function StudiioHomepage() {
               ))}
             </ul>
 
-            <div className="mt-3 border-t border-gray-300"></div>
+            <div className="mt-3 border-t border-gray-500"></div>
             <div className= "mt-2 text-gray-300 text-sm font-medium mb-2 text-center">Create a New Link:</div>
             <div className="flex flex-col gap-2 mb-4">
               <input
                 type="text"
-                placeholder="Link Name"
+                placeholder="Insert Link Name"
                 value={linkName}
                 onChange={(e) => setLinkName(e.target.value)}
                 className="border border-gray-600 rounded p-2 hover:border-white transition-colors text-[12px]"
               />
               <input
                 type="url"
-                placeholder="URL (https://example.com)"
+                placeholder="URL (https://studiio.xyz/)"
                 value={linkURL}
                 onChange={(e) => setLinkURL(e.target.value)}
                 className="bg-card border border-gray-600 rounded p-2 hover:border-white transition-colors text-[12px]"
