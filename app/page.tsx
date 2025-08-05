@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { Play, Pause, Square, Cloud, Sun, Clock, Calculator, Coffee, PenTool, Headphones, Timer } from "lucide-react"
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote" // Import the new component
+import { Input } from "@/components/ui/input"
+import { set } from "date-fns"
 
 export default function StudiioHomepage() {
   // Timer state
@@ -41,6 +43,12 @@ export default function StudiioHomepage() {
     { id: 2, text: "Submit essay draft", time: "5:00 PM", completed: false },
   ])
   const [newReminder, setNewReminder] = useState("")
+
+  // Weather state
+  const [temp, setTemp] = useState<any>(null)
+  const [condition, setCondition] = useState<any>(null)
+  const [city, setCity] = useState<any>(null)
+  const [zip, setZip] = useState<any>(localStorage.getItem("zip") || 10002)
 
   const breakActivities = [
     "Take 10 deep breaths",
@@ -202,6 +210,37 @@ export default function StudiioHomepage() {
     )
   }
 
+  const getWeatherData = async (countryCode: string = 'us') => {
+    let API_KEY: any = process.env.NEXT_PUBLIC_WEATHER_API_KEY
+    const url: string = `https://api.openweathermap.org/data/2.5/weather?zip=${zip},${countryCode}&appid=${API_KEY}`
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        setTemp("error fetching weather")
+        setCondition(`error getting weather for zip ${zip}`)
+        setCity("")
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      setTemp(`${((data.main.temp - 273.15) * 1.8 + 32).toFixed(1)} °F`)
+      setCondition(data.weather[0].description.replace(/\b\w/g, c => c.toUpperCase()))
+      setCity(data.name)
+    } catch (error) {
+      return "error fetching weather"
+    }
+  }
+
+  useEffect(() => {
+    getWeatherData('us')
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem("zip", zip)
+    getWeatherData('us')
+  }, [zip])
+
   return (
     <div className="min-h-screen bg-background p-4 overflow-hidden relative">
       <div className="stars" /> {/* Starry background element */}
@@ -236,8 +275,22 @@ export default function StudiioHomepage() {
               </div>
               <Sun className="w-5 h-5 text-gray-300" />
             </div>
-            <div className="text-xl font-bold text-white">72°F</div>
-            <div className="text-gray-400 text-xs">Sunny</div>
+
+            <div className="text-xl font-bold text-white">{temp}</div>
+            <div className="text-gray-400 text-xs">{condition}</div>
+            <div className="text-gray-400 text-xs">{city}</div>
+            <br />
+
+            <input
+              type="text"
+              placeholder="Enter ZIP code and press Enter"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  setZip(e.target.value)
+                }
+              }}
+              className="flex-1 bg-input-bg border border-input-border rounded-xl px-3 py-2 text-white text-xs placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-white"
+            />
           </div>
 
           {/* Pomodoro Timer Widget - Spans 2 columns on MD, 1 on LG/XL */}
@@ -311,11 +364,10 @@ export default function StudiioHomepage() {
                     setCurrentSound(sound)
                     setIsPlaying(!isPlaying || currentSound !== sound)
                   }}
-                  className={`p-2 rounded-xl text-xs transition-all duration-200 shadow-md ${
-                    currentSound === sound && isPlaying
-                      ? "bg-white/20 text-white border border-white/30 shadow-white/10"
-                      : "bg-button-bg text-gray-300 hover:bg-button-hover-bg border border-border"
-                  }`}
+                  className={`p-2 rounded-xl text-xs transition-all duration-200 shadow-md ${currentSound === sound && isPlaying
+                    ? "bg-white/20 text-white border border-white/30 shadow-white/10"
+                    : "bg-button-bg text-gray-300 hover:bg-button-hover-bg border border-border"
+                    }`}
                 >
                   {sound}
                 </button>
