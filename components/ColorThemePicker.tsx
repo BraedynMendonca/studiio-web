@@ -1,67 +1,64 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
 
-type ThemeOption = {
-  name: string
-  color: string
-}
-
-const themes: ThemeOption[] = [
-  { name: "Midnight Pulse", color: "#1E1E2F" },
-  { name: "Neon Wave", color: "#0FF0FC" },
-  { name: "Solar Flare", color: "#FF6F00" },
-  { name: "Lush Meadow", color: "#2E8B57" },
-  { name: "Retro Pop", color: "#FF4C98" },
-  { name: "Skybound", color: "#87CEFA" },
-  { name: "Mocha Mist", color: "#A9746E" },
-  { name: "Cyber Lime", color: "#BFFF00" },
-  { name: "Driftwood", color: "#C2B280" },
+const COLORS = [
+  { name: "Sakura Pink", hex: "#F472B6" },
+  { name: "Ocean Blue", hex: "#3B82F6" },
+  { name: "Mint Green", hex: "#34D399" },
+  { name: "Sunset Orange", hex: "#FB923C" },
+  { name: "Lavender Purple", hex: "#A78BFA" },
+  { name: "Lemon Yellow", hex: "#FACC15" },
+  { name: "Sky Teal", hex: "#2DD4BF" },
+  { name: "Rose Red", hex: "#E11D48" },
 ]
 
-export function ThemeSelector() {
-  const [selectedColor, setSelectedColor] = useState("#1E1E2F")
+export function ColorPaletteSelector() {
+  const [selectedColor, setSelectedColor] = useState<string | null>(null)
 
+  // When page loads, apply stored color
   useEffect(() => {
-    const saved = localStorage.getItem("bgColor")
-    if (saved) {
-      document.body.style.backgroundColor = saved
-      setSelectedColor(saved)
+    const savedColor = localStorage.getItem("selectedColor")
+    if (savedColor) {
+      setSelectedColor(savedColor)
+      updateContainerColor(savedColor)
     }
   }, [])
 
-  const handleColorChange = (color: string) => {
-    document.body.style.backgroundColor = color
-    localStorage.setItem("bgColor", color)
+  // Directly apply color to #app-container
+  const updateContainerColor = (color: string) => {
+    const container = document.getElementById("app-container")
+    if (container) {
+      container.style.backgroundColor = color
+    } else {
+      console.warn("App container not found")
+    }
+  }
+
+  const handleColorClick = (color: string) => {
     setSelectedColor(color)
+    localStorage.setItem("selectedColor", color)
+    updateContainerColor(color)
   }
 
   return (
-    <div className="mt-4 px-4">
-      <h2 className="text-xl font-bold mb-2 text-white">🎨 Theme Selector</h2>
-      <motion.div
-        className="flex gap-4 overflow-x-auto pb-2"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        {themes.map((theme) => (
-          <motion.button
-            key={theme.name}
-            onClick={() => handleColorChange(theme.color)}
-            className={`flex-shrink-0 rounded-2xl p-4 w-36 h-24 flex flex-col items-center justify-end transition-all duration-300 shadow-md ${
-              selectedColor === theme.color ? "ring-4 ring-white scale-105" : ""
-            }`}
-            style={{ backgroundColor: theme.color }}
-            whileHover={{ scale: 1.08 }}
+    <div className="rounded-2xl border border-border p-6 h-[540px] flex flex-col shadow-lg widget-hover bg-[#2a333b]">
+      <div className="text-gray-300 text-sm font-medium mb-4">Choose a color theme</div>
+      <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+        {COLORS.map((color, index) => (
+          <div
+            key={index}
+            onClick={() => handleColorClick(color.hex)}
+            style={{
+              backgroundColor: color.hex,
+              borderColor: selectedColor === color.hex ? "#ffffff" : "transparent",
+            }}
+            className="rounded-xl w-full h-20 cursor-pointer border-2 px-4 py-3 flex items-center justify-between transition-all"
           >
-            <span className="text-sm font-semibold text-white drop-shadow-sm">
-              {theme.name}
-            </span>
-          </motion.button>
+            <span className="text-white font-medium drop-shadow">{color.name}</span>
+          </div>
         ))}
-      </motion.div>
+      </div>
     </div>
   )
 }
