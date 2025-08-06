@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { set } from "date-fns"
 import { Audio } from "@/components/audio"
 
+import { ColorPaletteSelector } from "@/components/ColorThemePicker"; //Import the Color theme picker componenet
 
 export default function StudiioHomepage() {
   // Timer state
@@ -271,7 +272,10 @@ export default function StudiioHomepage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 overflow-hidden relative">
+    <div id="app-container" className="min-h-screen transition-colors duration-300">
+
+    <div id="app-container" className="min-h-screen transition-colors duration-300">
+
       <div className="stars" /> {/* Starry background element */}
       <div className="max-w-7xl mx-auto flex flex-col relative z-10">
         {/* Header */}
@@ -570,6 +574,9 @@ export default function StudiioHomepage() {
           {/* Inspiration/Quote Widget */}
           <InspirationQuote />
 
+          {/* Theme selector Widget */}
+          <ColorPaletteSelector />
+          
           {/* Links and Resources Widget */}
           <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
             <div className="flex items-center gap-2 mb-2">
@@ -637,5 +644,7 @@ export default function StudiioHomepage() {
         </div>
       </div>
     </div>
+    </div>
   )
 }
+
