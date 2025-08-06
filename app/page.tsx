@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Trash2, Play, Pause, Square, Cloud, Sun, Clock, Calculator, Coffee, PenTool, LayoutList, Headphones, Timer } from "lucide-react"
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote" // Import the new component
+import { ColorThemePicker } from "@/components/color-theme-picker"; //Import the Color theme picker componenet
 
 export default function StudiioHomepage() {
   // Timer state
@@ -522,6 +523,15 @@ export default function StudiioHomepage() {
 
           {/* Inspiration/Quote Widget */}
           <InspirationQuote />
+
+          {/* Theme selector Widget */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <ColorThemePicker />
+          </motion.div>
 
           {/* Links and Resources Widget */}
           <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
