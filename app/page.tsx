@@ -6,6 +6,8 @@ import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote" // Import the new component
 import { Input } from "@/components/ui/input"
 import { set } from "date-fns"
+import { Audio } from "@/components/audio"
+
 
 export default function StudiioHomepage() {
   // Timer state
@@ -241,6 +243,33 @@ export default function StudiioHomepage() {
     getWeatherData('us')
   }, [zip])
 
+  const [linkName, setLinkName] = useState("")
+  const [linkURL, setLinkURL] = useState("")
+  const [links, setLinks] = useState<{ id: number; name: string; url: string }[]>([])
+
+  const addLink = () => {
+    if (!linkName.trim() || !linkURL.trim()) {
+      alert("Please enter a value")
+      return
+    }
+
+    try {
+      new URL(linkURL)
+    } catch {
+      alert("Please enter a valid URL")
+      return
+    }
+
+    setLinks((prev) => [
+      ...prev,
+      { id: Date.now(), name: linkName.trim(), url: linkURL.trim() },
+    ])
+  }
+
+  const removeLink = (id: number) => {
+    setLinks((prev) => prev.filter((link) => link.id !== id))
+  }
+
   return (
     <div className="min-h-screen bg-background p-4 overflow-hidden relative">
       <div className="stars" /> {/* Starry background element */}
@@ -357,20 +386,13 @@ export default function StudiioHomepage() {
               <span className="text-gray-300 text-sm font-medium">Study Sounds</span>
             </div>
             <div className="grid grid-cols-2 gap-2 mb-3 flex-1">
-              {["Rain", "Vibe", "Nature", "White"].map((sound) => (
-                <button
-                  key={sound}
-                  onClick={() => {
-                    setCurrentSound(sound)
-                    setIsPlaying(!isPlaying || currentSound !== sound)
-                  }}
-                  className={`p-2 rounded-xl text-xs transition-all duration-200 shadow-md ${currentSound === sound && isPlaying
-                    ? "bg-white/20 text-white border border-white/30 shadow-white/10"
-                    : "bg-button-bg text-gray-300 hover:bg-button-hover-bg border border-border"
-                    }`}
-                >
-                  {sound}
-                </button>
+              {[
+                ["Rain", "/audio/rain.mp3"],
+                ["Vibe", "/audio/vibes.mp3"],
+                ["Nature", "/audio/nature.mp3"],
+                ["White", "/audio/whitenoise.mp3"],
+              ].map((sound) => (
+                Audio(sound[1], sound[0])
               ))}
             </div>
             {currentSound && isPlaying && (
@@ -587,7 +609,7 @@ export default function StudiioHomepage() {
             </ul>
 
             <div className="mt-3 border-t border-gray-500"></div>
-            <div className= "mt-2 text-gray-300 text-sm font-medium mb-2 text-center">Create a New Link:</div>
+            <div className="mt-2 text-gray-300 text-sm font-medium mb-2 text-center">Create a New Link:</div>
             <div className="flex flex-col gap-2 mb-4">
               <input
                 type="text"
@@ -611,7 +633,7 @@ export default function StudiioHomepage() {
               </button>
             </div>
           </div>
-        
+
         </div>
       </div>
     </div>
