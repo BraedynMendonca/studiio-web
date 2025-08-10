@@ -3,9 +3,13 @@
 import { SpotifyPlayer } from 'react-spotify-web-playback';
 import React from 'react';
 
-const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
-const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI;
+const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID!;
+const redirectUri = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI!;
 const scope = 'user-read-private user-read-email streaming playlist-read-private';
+
+if (!clientId || !redirectUri) {
+    throw new Error('Missing Spotify client ID or redirect URI in environment variables.');
+}
 
 function generateRandomString(length: number) {
     let text = '';
