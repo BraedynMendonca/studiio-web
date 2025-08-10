@@ -1,12 +1,21 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Trash2, Play, Pause, Square, Cloud, Sun, Clock, Calculator, Coffee, PenTool, LayoutList, Headphones, Timer } from "lucide-react"
+import { useState, useEffect, use } from "react"
+import { Trash2, Play, Pause, Square, Cloud, Sun, Clock, Calculator, Coffee, PenTool, LayoutList, Headphones, Timer, Music } from "lucide-react"
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote" // Import the new component
 import { Input } from "@/components/ui/input"
 import { set } from "date-fns"
 import { Audio } from "@/components/audio"
+import {
+  redirectToSpotifyAuth,
+  getSpotifyToken,
+  logout,
+  getUserProfile,
+  getUserPlaylists,
+  getPlaylistTracks,
+} from "@/components/spotifyPanel/utils"
+import { Player } from "@/components/spotifyPanel/Player"
 
 import { ColorPaletteSelector } from "@/components/ColorThemePicker"; //Import the Color theme picker componenet
 
@@ -52,6 +61,11 @@ export default function StudiioHomepage() {
   const [condition, setCondition] = useState<any>(null)
   const [city, setCity] = useState<any>(null)
   const [zip, setZip] = useState<any>(localStorage.getItem("zip") || 10002)
+
+  // Spotify state
+  const [spotifyToken, setSpotifyToken] = useState<any>(null)
+  const [playlists, setPlaylists] = useState<any[]>([])
+  const [trackUris, setTrackUris] = useState<any[]>([])
 
   const breakActivities = [
     "Take 10 deep breaths",
@@ -104,6 +118,46 @@ export default function StudiioHomepage() {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    const fetchSpotifyToken = async () => {
+      try {
+        const token = await getSpotifyToken();
+        setSpotifyToken(token);
+      } catch (error) {
+        // Token fetch failed - this is fine for initial load
+      }
+    };
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    if (code) {
+      fetchSpotifyToken();
+    }
+  }, []);
+
+  // Monitor trackUris changes
+  useEffect(() => {
+    console.log('Track URIs updated:', trackUris);
+  }, [trackUris]);
+
+  // Fetch playlists when token is available
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+      if (localStorage.getItem("access_token")) {
+        try {
+          const userPlaylists = await getUserPlaylists();
+          console.log("items:", userPlaylists);
+          setPlaylists(userPlaylists);
+        } catch (error) {
+          setPlaylists([]);
+        }
+      }
+    };
+
+    fetchPlaylists();
+  }, [spotifyToken])
 
   // Timer functions
   const startTimer = () => setIsRunning(true)
@@ -271,380 +325,434 @@ export default function StudiioHomepage() {
     setLinks((prev) => prev.filter((link) => link.id !== id))
   }
 
+
   return (
-    <div id="app-container" className="min-h-screen transition-colors duration-300">
+    <div id="app-container" className="min-h-screen transition-colors duration-300 pt-6 pb-6">
 
-    <div id="app-container" className="min-h-screen transition-colors duration-300">
+      <div id="app-container" className="min-h-screen transition-colors duration-300">
 
-      <div className="stars" /> {/* Starry background element */}
-      <div className="max-w-7xl mx-auto flex flex-col relative z-10">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
-          <p className="text-gray-400 text-sm">Your Complete Study Hub - Stay Focused, Stay Organized</p>
-        </div>
-        {/* Widget Grid */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
-          {/* Current Time Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Time</span>
-            </div>
-            <div className="text-xl font-bold text-white">
-              {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </div>
-            <div className="text-gray-400 text-xs">
-              {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
-            </div>
+        <div className="stars" /> {/* Starry background element */}
+        <div className="max-w-7xl mx-auto flex flex-col relative z-10">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
+            <p className="text-gray-400 text-sm">Your Complete Study Hub - Stay Focused, Stay Organized</p>
           </div>
-
-          {/* Weather Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Cloud className="w-4 h-4 text-accent-white" />
-                <span className="text-gray-300 text-sm font-medium">Weather</span>
+          {/* Widget Grid */}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
+            {/* Current Time Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Time</span>
               </div>
-              <Sun className="w-5 h-5 text-gray-300" />
-            </div>
-
-            <div className="text-xl font-bold text-white">{temp}</div>
-            <div className="text-gray-400 text-xs">{condition}</div>
-            <div className="text-gray-400 text-xs">{city}</div>
-            <br />
-
-            <input
-              type="text"
-              placeholder="Enter ZIP code and press Enter"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setZip(e.target.value)
-                }
-              }}
-              className="flex-1 bg-input-bg border border-input-border rounded-xl px-3 py-2 text-white text-xs placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-white"
-            />
-          </div>
-
-          {/* Pomodoro Timer Widget - Spans 2 columns on MD, 1 on LG/XL */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 md:col-span-2 lg:col-span-1 flex flex-col justify-center shadow-lg widget-hover">
-            <div className="flex items-center gap-2 mb-3">
-              <Timer className="w-4 h-4 text-gray-300" />
-              <span className="text-gray-300 text-sm font-medium">Pomodoro Timer</span>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">{formatTime(timeLeft)}</div>
-              <div className="text-gray-400 text-xs mb-3">
-                {isBreak ? "Break Time" : "Work Time"} • Session {sessionCount}
+              <div className="text-xl font-bold text-white">
+                {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </div>
-              <div className="flex justify-center gap-2">
-                <button
-                  onClick={startTimer}
-                  disabled={isRunning}
-                  className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-green-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
-                >
-                  <Play className="w-3 h-3" />
-                  Start
-                </button>
-                <button
-                  onClick={pauseTimer}
-                  disabled={!isRunning}
-                  className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-yellow-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
-                >
-                  <Pause className="w-3 h-3" />
-                  Pause
-                </button>
-                <button
-                  onClick={resetTimer}
-                  className="bg-button-bg hover:bg-button-hover-bg text-red-400 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
-                >
-                  <Square className="w-3 h-3" />
-                  Reset
-                </button>
+              <div className="text-gray-400 text-xs">
+                {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
               </div>
             </div>
-          </div>
 
-          {/* Quick Notes Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
-            <div className="flex items-center gap-2 mb-2">
-              <PenTool className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Quick Notes</span>
-            </div>
-            <textarea
-              value={notes}
-              onChange={(e) => {
-                setNotes(e.target.value)
-                setWordCount(e.target.value.split(/\s+/).filter((word) => word.length > 0).length)
-              }}
-              placeholder="Jot down thoughts..."
-              className="flex-1 w-full bg-input-bg border border-input-border rounded-xl px-3 py-2 text-white text-xs placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-accent-white"
-            />
-            <div className="text-gray-400 text-xs mt-1">{wordCount} words</div>
-          </div>
-
-          {/* Study Sounds Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
-            <div className="flex items-center gap-2 mb-3">
-              <Headphones className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Study Sounds</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 mb-3 flex-1">
-              {[
-                ["Rain", "/audio/rain.mp3"],
-                ["Vibe", "/audio/vibes.mp3"],
-                ["Nature", "/audio/nature.mp3"],
-                ["White", "/audio/whitenoise.mp3"],
-              ].map((sound) => (
-                Audio(sound[1], sound[0])
-              ))}
-            </div>
-            {currentSound && isPlaying && (
-              <div className="text-xs text-gray-300 text-center animate-pulse">♪ {currentSound}</div>
-            )}
-          </div>
-
-          {/* Socrates AI Chatbot Widget - Fixed height to prevent stretching */}
-          <div className="h-[450px]">
-            <SocratesChatbot />
-          </div>
-
-          {/* Study Break Timer Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover h-[540px]">
-            <div className="flex items-center gap-2 mb-3">
-              <Coffee className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Break Timer</span>
-            </div>
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="text-center mb-3">
-                <div className="text-2xl font-mono font-bold text-white mb-1">{formatTime(breakTimeLeft)}</div>
-                <div className="text-xs text-gray-400 mb-2">
-                  {breakActivities[Math.floor(Math.random() * breakActivities.length)]}
+            {/* Weather Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Cloud className="w-4 h-4 text-accent-white" />
+                  <span className="text-gray-300 text-sm font-medium">Weather</span>
                 </div>
-              </div>
-              <div className="flex gap-1">
-                <button
-                  onClick={startBreakTimer}
-                  disabled={isBreakRunning}
-                  className="flex-1 bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-green-400 disabled:text-gray-500 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
-                >
-                  Start
-                </button>
-                <button
-                  onClick={pauseBreakTimer}
-                  disabled={!isBreakRunning}
-                  className="flex-1 bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-yellow-400 disabled:text-gray-500 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
-                >
-                  Pause
-                </button>
-                <button
-                  onClick={resetBreakTimer}
-                  className="flex-1 bg-button-bg hover:bg-button-hover-bg text-red-400 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Calculator Widget - Moved to Reminders' old spot */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover h-[540px]">
-            <div className="flex items-center gap-2 mb-3">
-              <Calculator className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Calculator</span>
-            </div>
-            <div className="flex-1 flex flex-col">
-              {/* Display */}
-              <div className="bg-input-bg border border-input-border rounded-xl p-2 mb-2">
-                <div className="text-right text-white text-sm font-mono truncate">{calcDisplay}</div>
+                <Sun className="w-5 h-5 text-gray-300" />
               </div>
 
-              {/* Buttons */}
-              <div className="grid grid-cols-4 gap-1 h-full grid-rows-5">
-                <button
-                  onClick={clearCalculator}
-                  className="bg-button-bg hover:bg-button-hover-bg text-red-400 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  C
-                </button>
-                <button
-                  onClick={() => inputOperation("/")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  ÷
-                </button>
-                <button
-                  onClick={() => inputOperation("*")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  ×
-                </button>
-                <button
-                  onClick={() => inputOperation("-")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  −
-                </button>
+              <div className="text-xl font-bold text-white">{temp}</div>
+              <div className="text-gray-400 text-xs">{condition}</div>
+              <div className="text-gray-400 text-xs">{city}</div>
+              <br />
 
-                <button
-                  onClick={() => inputNumber("7")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  7
-                </button>
-                <button
-                  onClick={() => inputNumber("8")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  8
-                </button>
-                <button
-                  onClick={() => inputNumber("9")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  9
-                </button>
-                <button
-                  onClick={() => inputOperation("+")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs row-span-2 transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  +
-                </button>
-
-                <button
-                  onClick={() => inputNumber("4")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  4
-                </button>
-                <button
-                  onClick={() => inputNumber("5")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  5
-                </button>
-                <button
-                  onClick={() => inputNumber("6")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  6
-                </button>
-
-                <button
-                  onClick={() => inputNumber("1")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  1
-                </button>
-                <button
-                  onClick={() => inputNumber("2")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  2
-                </button>
-                <button
-                  onClick={() => inputNumber("3")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  3
-                </button>
-                <button
-                  onClick={performCalculation}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs row-span-2 transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  =
-                </button>
-
-                <button
-                  onClick={() => inputNumber("0")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs col-span-2 transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  0
-                </button>
-                <button
-                  onClick={() => inputNumber(".")}
-                  className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
-                >
-                  .
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Inspiration/Quote Widget */}
-          <InspirationQuote />
-
-          {/* Theme selector Widget */}
-          <ColorPaletteSelector />
-          
-          {/* Links and Resources Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
-            <div className="flex items-center gap-2 mb-2">
-              <LayoutList className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Links & Resources</span>
-            </div>
-
-            <ul className="flex flex-col gap-2 text-[13px]">
-              {links.length === 0 && (
-                <li className="text-gray-500 text-xs italic text-center">
-                  No links added yet
-                </li>
-              )}
-              {links.map(({ id, name, url }) => (
-                <li
-                  key={id}
-                  className="flex items-center border border-gray-600 rounded p-2 hover:border-white transition-colors"
-                >
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className=" text-white text-sm truncate max-w-[80%] hover:underline text-[12px]"
-                    title={url}
-                  >
-                    {name}
-                  </a>
-                  <button
-                    onClick={() => removeLink(id)}
-                    className="text-red-500 hover:text-red-350 p-1 rounded ml-auto"
-                    aria-label={`Remove ${name}`}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-3 border-t border-gray-500"></div>
-            <div className="mt-2 text-gray-300 text-sm font-medium mb-2 text-center">Create a New Link:</div>
-            <div className="flex flex-col gap-2 mb-4">
               <input
                 type="text"
-                placeholder="Insert Link Name"
-                value={linkName}
-                onChange={(e) => setLinkName(e.target.value)}
-                className="border border-gray-600 rounded p-2 hover:border-white transition-colors text-[12px]"
+                placeholder="Enter ZIP code and press Enter"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setZip(e.target.value)
+                  }
+                }}
+                className="flex-1 bg-input-bg border border-input-border rounded-xl px-3 py-2 text-white text-xs placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-white"
               />
-              <input
-                type="url"
-                placeholder="URL (https://studiio.xyz/)"
-                value={linkURL}
-                onChange={(e) => setLinkURL(e.target.value)}
-                className="bg-card border border-gray-600 rounded p-2 hover:border-white transition-colors text-[12px]"
+            </div>
+
+            {/* Pomodoro Timer Widget - Spans 2 columns on MD, 1 on LG/XL */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 md:col-span-2 lg:col-span-1 flex flex-col justify-center shadow-lg widget-hover">
+              <div className="flex items-center gap-2 mb-3">
+                <Timer className="w-4 h-4 text-gray-300" />
+                <span className="text-gray-300 text-sm font-medium">Pomodoro Timer</span>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">{formatTime(timeLeft)}</div>
+                <div className="text-gray-400 text-xs mb-3">
+                  {isBreak ? "Break Time" : "Work Time"} • Session {sessionCount}
+                </div>
+                <div className="flex justify-center gap-2">
+                  <button
+                    onClick={startTimer}
+                    disabled={isRunning}
+                    className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-green-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
+                  >
+                    <Play className="w-3 h-3" />
+                    Start
+                  </button>
+                  <button
+                    onClick={pauseTimer}
+                    disabled={!isRunning}
+                    className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-yellow-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
+                  >
+                    <Pause className="w-3 h-3" />
+                    Pause
+                  </button>
+                  <button
+                    onClick={resetTimer}
+                    className="bg-button-bg hover:bg-button-hover-bg text-red-400 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
+                  >
+                    <Square className="w-3 h-3" />
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Notes Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
+              <div className="flex items-center gap-2 mb-2">
+                <PenTool className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Quick Notes</span>
+              </div>
+              <textarea
+                value={notes}
+                onChange={(e) => {
+                  setNotes(e.target.value)
+                  setWordCount(e.target.value.split(/\s+/).filter((word) => word.length > 0).length)
+                }}
+                placeholder="Jot down thoughts..."
+                className="flex-1 w-full bg-input-bg border border-input-border rounded-xl px-3 py-2 text-white text-xs placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-accent-white"
               />
-              <button
-                onClick={addLink}
-                className="bg-gray-600 hover:bg-button-hover-bg text-white px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md"
-              >
-                Add Link
-              </button>
+              <div className="text-gray-400 text-xs mt-1">{wordCount} words</div>
+            </div>
+
+            {/* Study Sounds Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
+              <div className="flex items-center gap-2 mb-3">
+                <Headphones className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Study Sounds</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 mb-3 flex-1">
+                {[
+                  ["Rain", "/audio/rain.mp3"],
+                  ["Vibe", "/audio/vibes.mp3"],
+                  ["Nature", "/audio/nature.mp3"],
+                  ["White", "/audio/whitenoise.mp3"],
+                ].map((sound) => (
+                  Audio(sound[1], sound[0])
+                ))}
+              </div>
+              {currentSound && isPlaying && (
+                <div className="text-xs text-gray-300 text-center animate-pulse">♪ {currentSound}</div>
+              )}
+            </div>
+
+            {/* Socrates AI Chatbot Widget - Fixed height to prevent stretching */}
+            <div className="h-[450px]">
+              <SocratesChatbot />
+            </div>
+
+            {/* Study Break Timer Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover h-[540px]">
+              <div className="flex items-center gap-2 mb-3">
+                <Coffee className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Break Timer</span>
+              </div>
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="text-center mb-3">
+                  <div className="text-2xl font-mono font-bold text-white mb-1">{formatTime(breakTimeLeft)}</div>
+                  <div className="text-xs text-gray-400 mb-2">
+                    {breakActivities[Math.floor(Math.random() * breakActivities.length)]}
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  <button
+                    onClick={startBreakTimer}
+                    disabled={isBreakRunning}
+                    className="flex-1 bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-green-400 disabled:text-gray-500 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
+                  >
+                    Start
+                  </button>
+                  <button
+                    onClick={pauseBreakTimer}
+                    disabled={!isBreakRunning}
+                    className="flex-1 bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-yellow-400 disabled:text-gray-500 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
+                  >
+                    Pause
+                  </button>
+                  <button
+                    onClick={resetBreakTimer}
+                    className="flex-1 bg-button-bg hover:bg-button-hover-bg text-red-400 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Calculator Widget - Moved to Reminders' old spot */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover h-[540px]">
+              <div className="flex items-center gap-2 mb-3">
+                <Calculator className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Calculator</span>
+              </div>
+              <div className="flex-1 flex flex-col">
+                {/* Display */}
+                <div className="bg-input-bg border border-input-border rounded-xl p-2 mb-2">
+                  <div className="text-right text-white text-sm font-mono truncate">{calcDisplay}</div>
+                </div>
+
+                {/* Buttons */}
+                <div className="grid grid-cols-4 gap-1 h-full grid-rows-5">
+                  <button
+                    onClick={clearCalculator}
+                    className="bg-button-bg hover:bg-button-hover-bg text-red-400 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    C
+                  </button>
+                  <button
+                    onClick={() => inputOperation("/")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    ÷
+                  </button>
+                  <button
+                    onClick={() => inputOperation("*")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    ×
+                  </button>
+                  <button
+                    onClick={() => inputOperation("-")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    −
+                  </button>
+
+                  <button
+                    onClick={() => inputNumber("7")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    7
+                  </button>
+                  <button
+                    onClick={() => inputNumber("8")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    8
+                  </button>
+                  <button
+                    onClick={() => inputNumber("9")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    9
+                  </button>
+                  <button
+                    onClick={() => inputOperation("+")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-gray-300 rounded-lg text-xs row-span-2 transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    +
+                  </button>
+
+                  <button
+                    onClick={() => inputNumber("4")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    4
+                  </button>
+                  <button
+                    onClick={() => inputNumber("5")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    5
+                  </button>
+                  <button
+                    onClick={() => inputNumber("6")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    6
+                  </button>
+
+                  <button
+                    onClick={() => inputNumber("1")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    1
+                  </button>
+                  <button
+                    onClick={() => inputNumber("2")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    2
+                  </button>
+                  <button
+                    onClick={() => inputNumber("3")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    3
+                  </button>
+                  <button
+                    onClick={performCalculation}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs row-span-2 transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    =
+                  </button>
+
+                  <button
+                    onClick={() => inputNumber("0")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs col-span-2 transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    0
+                  </button>
+                  <button
+                    onClick={() => inputNumber(".")}
+                    className="bg-button-bg hover:bg-button-hover-bg text-white rounded-lg text-xs transition-all duration-200 shadow-md calc-button-outline"
+                  >
+                    .
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Inspiration/Quote Widget */}
+            <InspirationQuote />
+
+            {/* Theme selector Widget */}
+            <ColorPaletteSelector />
+
+            {/* Links and Resources Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
+              <div className="flex items-center gap-2 mb-2">
+                <LayoutList className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Links & Resources</span>
+              </div>
+
+              <ul className="flex flex-col gap-2 text-[13px]">
+                {links.length === 0 && (
+                  <li className="text-gray-500 text-xs italic text-center">
+                    No links added yet
+                  </li>
+                )}
+                {links.map(({ id, name, url }) => (
+                  <li
+                    key={id}
+                    className="flex items-center border border-gray-600 rounded p-2 hover:border-white transition-colors"
+                  >
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className=" text-white text-sm truncate max-w-[80%] hover:underline text-[12px]"
+                      title={url}
+                    >
+                      {name}
+                    </a>
+                    <button
+                      onClick={() => removeLink(id)}
+                      className="text-red-500 hover:text-red-350 p-1 rounded ml-auto"
+                      aria-label={`Remove ${name}`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-3 border-t border-gray-500"></div>
+              <div className="mt-2 text-gray-300 text-sm font-medium mb-2 text-center">Create a New Link:</div>
+              <div className="flex flex-col gap-2 mb-4">
+                <input
+                  type="text"
+                  placeholder="Insert Link Name"
+                  value={linkName}
+                  onChange={(e) => setLinkName(e.target.value)}
+                  className="border border-gray-600 rounded p-2 hover:border-white transition-colors text-[12px]"
+                />
+                <input
+                  type="url"
+                  placeholder="URL (https://studiio.xyz/)"
+                  value={linkURL}
+                  onChange={(e) => setLinkURL(e.target.value)}
+                  className="bg-card border border-gray-600 rounded p-2 hover:border-white transition-colors text-[12px]"
+                />
+                <button
+                  onClick={addLink}
+                  className="bg-gray-600 hover:bg-button-hover-bg text-white px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md"
+                >
+                  Add Link
+                </button>
+              </div>
+            </div>
+
+            {/* Spotify Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
+              <div className="flex items-center gap-2 mb-2">
+                <Music className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Spotify</span>
+              </div>
+
+              {localStorage.getItem("access_token") ? (
+                <div className="flex flex-col gap-2 flex-1">
+                  <div>
+                    <div className="text-xs text-gray-300 mb-2">
+                      Connected to Spotify
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {
+                        playlists.map(playlist => (
+                          <button
+                            onClick={async () => {
+                              const tracks = await getPlaylistTracks(playlist.id);
+                              setTrackUris(tracks);
+                            }}
+                            className="bg-gray-600 hover:bg-button-hover-bg text-white px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md"
+                          >
+                            {playlist.name}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                  <div className="mt-auto">
+                    <Player uris={trackUris} />
+                  </div>
+                  <button
+                    onClick={logout}
+                    className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md mt-2"
+                  >
+                    Disconnect
+                  </button>
+
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <div className="text-xs text-gray-400">
+                    Connect your Spotify account to control playback (Requires Premium)
+                  </div>
+                  <button
+                    onClick={() => redirectToSpotifyAuth()}
+                    className="bg-[#1DB954]/20 hover:bg-[#1DB954]/30 text-[#1DB954] px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+                  >
+                    <Music className="w-3 h-3" />
+                    Connect Spotify
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-
         </div>
       </div>
     </div>
-    </div>
   )
 }
-
