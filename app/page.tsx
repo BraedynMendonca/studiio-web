@@ -52,6 +52,11 @@ export default function StudiioHomepage() {
     "Do 10 jumping jacks",
   ]
 
+  // FIXED: Add state for current break suggestion
+  const [currentBreakSuggestion, setCurrentBreakSuggestion] = useState(
+    breakActivities[Math.floor(Math.random() * breakActivities.length)]
+  )
+
   // Timer effect
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -94,6 +99,16 @@ export default function StudiioHomepage() {
     }, 1000)
     return () => clearInterval(timer)
   }, [])
+
+  // FIXED: Add useEffect to update break suggestion every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * breakActivities.length)
+      setCurrentBreakSuggestion(breakActivities[randomIndex])
+    }, 3000) // Update every 3 seconds
+
+    return () => clearInterval(interval)
+  }, []) // Empty dependency array means this only runs once on mount
 
   // Timer functions
   const startTimer = () => setIsRunning(true)
@@ -371,8 +386,9 @@ export default function StudiioHomepage() {
             <div className="flex-1 flex flex-col justify-center">
               <div className="text-center mb-3">
                 <div className="text-2xl font-mono font-bold text-white mb-1">{formatTime(breakTimeLeft)}</div>
+                {/* FIXED: Use currentBreakSuggestion from state instead of random calculation */}
                 <div className="text-xs text-gray-400 mb-2">
-                  {breakActivities[Math.floor(Math.random() * breakActivities.length)]}
+                  {currentBreakSuggestion}
                 </div>
               </div>
               <div className="flex gap-1">
