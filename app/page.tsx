@@ -240,7 +240,7 @@ export default function StudiioHomepage() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
-          <p className="text-white-400 text-sm">Your Complete Study Hub - Stay Focused, Stay Organized</p>
+          <p className="text-white-400 text-sm">studying made simple.</p>
         </div>
         {/* Widget Grid */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
