@@ -283,3 +283,13 @@ textarea::placeholder {
 .min-h-screen {
   min-height: 100vh; /* Changed from height: 100vh; max-height: 100vh; */
 }
+
+.select-no-arrow {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  /* Optionally add a custom arrow icon as background here */
+}

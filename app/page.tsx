@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Trash2, Play, Pause, Square, Cloud, Sun, Clock, Calculator, Coffee, PenTool, LayoutList, Headphones, Timer } from "lucide-react"
+import { Pencil, Trash2, Play, Pause, Square, Cloud, Sun, Clock, Calculator, Coffee, PenTool, LayoutList, Headphones, Timer } from "lucide-react"
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote" // Import the new component
 import { ColorPaletteSelector } from "@/components/ColorThemePicker"; //Import the Color theme picker componenet
@@ -9,11 +9,18 @@ import { ColorPaletteSelector } from "@/components/ColorThemePicker"; //Import t
 export default function StudiioHomepage() {
   // Timer state
   const [timeLeft, setTimeLeft] = useState(25 * 60)
-  const [isRunning, setIsRunning] = useState(false)
-  const [isBreak, setIsBreak] = useState(false)
+  const[timerRunning, setTimerRunning] = useState(false)
+  const [selectedMinutes, setSelectedMinutes] = useState(25);
+  const [selectedSeconds, setSelectedSeconds] = useState(0);
+
+  const[breakTimeLeft, setBreakTimeLeft] = useState(10*60)
+  const[breakTimerRunning, setBreakTimerRunning] = useState(false)
+  const [selectedBreakMinutes, setSelectedBreakMinutes] = useState(10);
+  const [selectedBreakSeconds, setSelectedBreakSeconds] = useState(0);
+
+  const[timerStarted, setTimerStarted] = useState(false)
   const [sessionCount, setSessionCount] = useState(1)
-  const [workDuration, setWorkDuration] = useState(25)
-  const [breakDuration, setBreakDuration] = useState(5)
+  const[isWorking, setIsWorking] = useState(false) //false is break, true is work
 
   // Notes state
   const [notes, setNotes] = useState("")
@@ -32,10 +39,6 @@ export default function StudiioHomepage() {
   const [calcOperation, setCalcOperation] = useState<string | null>(null)
   const [calcWaitingForOperand, setCalcWaitingForOperand] = useState(false)
 
-  // Break timer state
-  const [breakTimeLeft, setBreakTimeLeft] = useState(5 * 60)
-  const [isBreakRunning, setIsBreakRunning] = useState(false)
-
   // Reminders state
   const [reminders, setReminders] = useState([
     { id: 1, text: "Review math notes", time: "2:00 PM", completed: false },
@@ -52,40 +55,38 @@ export default function StudiioHomepage() {
     "Do 10 jumping jacks",
   ]
 
+  useEffect(() => {
+    setTimeLeft(selectedMinutes * 60 + selectedSeconds);
+  }, [selectedMinutes, selectedSeconds]);
+
+  useEffect(() => {
+    setBreakTimeLeft(selectedBreakMinutes * 60 + selectedBreakSeconds);
+  }, [selectedBreakMinutes, selectedBreakSeconds]);
+
   // Timer effect
   useEffect(() => {
     let interval: NodeJS.Timeout
-    if (isRunning && timeLeft > 0) {
+    if (timerStarted && timerRunning && timeLeft > 0 && isWorking) {
       interval = setInterval(() => {
         setTimeLeft(timeLeft - 1)
       }, 1000)
-    } else if (timeLeft === 0) {
-      setIsRunning(false)
-      if (!isBreak) {
-        setTimeLeft(breakDuration * 60)
-        setIsBreak(true)
-      } else {
-        setTimeLeft(workDuration * 60)
-        setIsBreak(false)
-        setSessionCount(sessionCount + 1)
-      }
-    }
-    return () => clearInterval(interval)
-  }, [isRunning, timeLeft, isBreak, workDuration, breakDuration, sessionCount])
-
-  // Break timer effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout
-    if (isBreakRunning && breakTimeLeft > 0) {
+    } else if (timerStarted && breakTimerRunning && breakTimeLeft > 0 && !isWorking) {
       interval = setInterval(() => {
         setBreakTimeLeft(breakTimeLeft - 1)
       }, 1000)
-    } else if (breakTimeLeft === 0) {
-      setIsBreakRunning(false)
-      setBreakTimeLeft(5 * 60)
+    } else if(isWorking && timerStarted && timerRunning && timeLeft == 0){
+      setIsWorking(false)
+      setTimerRunning(false)
+      setBreakTimerRunning(true)
+      setTimeLeft(selectedMinutes * 60 + selectedSeconds);
+    } else if(!isWorking && timerStarted && breakTimerRunning && breakTimeLeft == 0){
+      setIsWorking(true)
+      setTimerRunning(true)
+      setBreakTimerRunning(false)
+      setBreakTimeLeft(selectedBreakMinutes * 60 + selectedBreakSeconds);
     }
     return () => clearInterval(interval)
-  }, [isBreakRunning, breakTimeLeft])
+  }, [isWorking, timerStarted, timerRunning, timeLeft, breakTimerRunning, breakTimeLeft])
 
   // Update current time every second
   useEffect(() => {
@@ -96,21 +97,34 @@ export default function StudiioHomepage() {
   }, [])
 
   // Timer functions
-  const startTimer = () => setIsRunning(true)
-  const pauseTimer = () => setIsRunning(false)
-  const resetTimer = () => {
-    setIsRunning(false)
-    setTimeLeft(workDuration * 60)
-    setIsBreak(false)
-    setSessionCount(1)
+  const startTimer = () => {
+    if (!timerStarted){
+      setTimerRunning(true); 
+      setTimerStarted(true);
+      setIsWorking(true)
+    }
+    else if (timerStarted && isWorking){
+      setTimerRunning(true); 
+    }
+    else if (timerStarted && !isWorking){
+      setBreakTimerRunning(true); 
+    }
   }
+  const pauseTimer = () => {
+    if (timerRunning){
+      setTimerRunning(false)
+    }
+    else if (breakTimerRunning){
+      setBreakTimerRunning(false)
+    }
+  }
+  const resetTimer = () => {
+    setTimerStarted(false)
+    setTimerRunning(false)
+    setBreakTimerRunning(false)
+    setIsWorking(true)
 
-  // Break timer functions
-  const startBreakTimer = () => setIsBreakRunning(true)
-  const pauseBreakTimer = () => setIsBreakRunning(false)
-  const resetBreakTimer = () => {
-    setIsBreakRunning(false)
-    setBreakTimeLeft(5 * 60)
+    setSessionCount(1)
   }
 
   // Format time for display
@@ -273,40 +287,147 @@ export default function StudiioHomepage() {
 
           {/* Pomodoro Timer Widget - Spans 2 columns on MD, 1 on LG/XL */}
           <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 md:col-span-2 lg:col-span-1 flex flex-col justify-center shadow-lg widget-hover">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-1">
               <Timer className="w-4 h-4 text-gray-300" />
-              <span className="text-gray-300 text-sm font-medium">Pomodoro Timer</span>
+              <span className="text-gray-300 text-sm font-medium">Pomodoro</span>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">{formatTime(timeLeft)}</div>
-              <div className="text-gray-400 text-xs mb-3">
-                {isBreak ? "Break Time" : "Work Time"} • Session {sessionCount}
+            <div className="text-xs mb-3 text-gray-400">
+              Click on the times to change them!
+            </div>
+            <div className="border border-gray-600 rounded-xl p-3 mt-2">
+              <div className="flex items-center gap-2 mb-3 top-2">
+                <Pencil className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Work Timer</span>
               </div>
-              <div className="flex justify-center gap-2">
-                <button
-                  onClick={startTimer}
-                  disabled={isRunning}
-                  className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-green-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
-                >
-                  <Play className="w-3 h-3" />
-                  Start
-                </button>
-                <button
-                  onClick={pauseTimer}
-                  disabled={!isRunning}
-                  className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-yellow-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
-                >
-                  <Pause className="w-3 h-3" />
-                  Pause
-                </button>
-                <button
-                  onClick={resetTimer}
-                  className="bg-button-bg hover:bg-button-hover-bg text-red-400 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
-                >
-                  <Square className="w-3 h-3" />
-                  Reset
-                </button>
+              <div className="flex justify-center">
+                <div className="text-center mb-2">
+                  {!timerStarted? (
+                    <>
+                      {/* Minutes Dropdown */}
+                      <select
+                        className="select-no-arrow w-8 text-2xl font-mono font-bold text-white bg-transparent border-b border-gray-500 text-center focus:outline-none"
+                        value={selectedMinutes}
+                        onChange={(e) => setSelectedMinutes(Number(e.target.value))}
+                      >
+                        {[...Array(60)].map((_, i) => (
+                          <option
+                            className="bg-card w-8 text-2xl font-mono font-bold text-white"
+                            key={i}
+                            value={i}
+                          >
+                            {i.toString().padStart(2, "0")}
+                          </option>
+                        ))}
+                      </select>
+
+                      <span className="w-8 text-2xl font-mono font-bold text-white">:</span>
+
+                      {/* Seconds Dropdown */}
+                      <select
+                        className="select-no-arrow w-8 text-2xl font-mono font-bold text-white bg-transparent border-b border-gray-500 text-center focus:outline-none"
+                        value={selectedSeconds}
+                        onChange={(e) => setSelectedSeconds(Number(e.target.value))}
+                      >
+                        {[...Array(60)].map((_, i) => (
+                          <option
+                            className="bg-card w-8 text-2xl font-mono font-bold text-white"
+                            key={i}
+                            value={i}
+                          >
+                            {i.toString().padStart(2, "0")}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  ) : (
+                    <div className="text-2xl font-mono font-bold text-white mb-1">
+                      {formatTime(timeLeft)}
+                    </div>
+                  )}
+                  <div className="text-gray-400 text-xs mb-1">
+                    Session {sessionCount}
+                  </div>
+                </div>
               </div>
+            </div>
+            <div className="border border-gray-600 rounded-xl p-3 mt-2">
+              <div className="flex items-center gap-2 mb-3 top-2">
+                <Coffee className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Break Timer</span>
+              </div>
+              <div className="flex justify-center">
+                <div className="text-center mb-3">
+                  {!timerStarted? (
+                    <>
+                      <select
+                        className="select-no-arrow w-8 text-2xl font-mono font-bold text-white bg-transparent border-b border-gray-500 text-center focus:outline-none"
+                        value={selectedBreakMinutes}
+                        onChange={(e) => setSelectedBreakMinutes(Number(e.target.value))}
+                      >
+                        {[...Array(60)].map((_, i) => (
+                          <option
+                            className="bg-card w-8 text-2xl font-mono font-bold text-white"
+                            key={i}
+                            value={i}
+                          >
+                            {i.toString().padStart(2, "0")}
+                          </option>
+                        ))}
+                      </select>
+
+                      <span className="w-8 text-2xl font-mono font-bold text-white">:</span>
+
+                      <select
+                        className="select-no-arrow w-8 text-2xl font-mono font-bold text-white bg-transparent border-b border-gray-500 text-center focus:outline-none"
+                        value={selectedBreakSeconds}
+                        onChange={(e) => setSelectedBreakSeconds(Number(e.target.value))}
+                      >
+                        {[...Array(60)].map((_, i) => (
+                          <option
+                            className="bg-card w-8 text-2xl font-mono font-bold text-white"
+                            key={i}
+                            value={i}
+                          >
+                            {i.toString().padStart(2, "0")}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  ) : (
+                    <div className="text-2xl font-mono font-bold text-white mb-1">
+                      {formatTime(breakTimeLeft)}
+                    </div>
+                  )}
+                  <div className="text-xs text-gray-400 mb-1">
+                    {breakActivities[Math.floor(Math.random() * breakActivities.length)]}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center gap-2 mt-2">
+              <button
+                onClick={startTimer}
+                disabled={timerRunning || breakTimerRunning}
+                className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-green-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
+              >
+                <Play className="w-3 h-3" />
+                Start
+              </button>
+              <button
+                onClick={pauseTimer}
+                disabled={!timerRunning && !breakTimerRunning}
+                className="bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-yellow-400 disabled:text-gray-500 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
+              >
+                <Pause className="w-3 h-3" />
+                Pause
+              </button>
+              <button
+                onClick={resetTimer}
+                className="bg-button-bg hover:bg-button-hover-bg text-red-400 px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition-all duration-200 shadow-md"
+              >
+                <Square className="w-3 h-3" />
+                Reset
+              </button>
             </div>
           </div>
 
@@ -360,44 +481,6 @@ export default function StudiioHomepage() {
           {/* Socrates AI Chatbot Widget - Fixed height to prevent stretching */}
           <div className="h-[450px]">
             <SocratesChatbot />
-          </div>
-
-          {/* Study Break Timer Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover h-[540px]">
-            <div className="flex items-center gap-2 mb-3">
-              <Coffee className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Break Timer</span>
-            </div>
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="text-center mb-3">
-                <div className="text-2xl font-mono font-bold text-white mb-1">{formatTime(breakTimeLeft)}</div>
-                <div className="text-xs text-gray-400 mb-2">
-                  {breakActivities[Math.floor(Math.random() * breakActivities.length)]}
-                </div>
-              </div>
-              <div className="flex gap-1">
-                <button
-                  onClick={startBreakTimer}
-                  disabled={isBreakRunning}
-                  className="flex-1 bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-green-400 disabled:text-gray-500 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
-                >
-                  Start
-                </button>
-                <button
-                  onClick={pauseBreakTimer}
-                  disabled={!isBreakRunning}
-                  className="flex-1 bg-button-bg hover:bg-button-hover-bg disabled:bg-gray-800 text-yellow-400 disabled:text-gray-500 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
-                >
-                  Pause
-                </button>
-                <button
-                  onClick={resetBreakTimer}
-                  className="flex-1 bg-button-bg hover:bg-button-hover-bg text-red-400 py-1.5 rounded-lg text-xs transition-all duration-200 shadow-md"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Quick Calculator Widget - Moved to Reminders' old spot */}
