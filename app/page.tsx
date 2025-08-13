@@ -331,28 +331,28 @@ export default function StudiioHomepage() {
 
       <div id="app-container" className="min-h-screen transition-colors duration-300">
 
-        <div className="stars" /> {/* Starry background element */}
-        <div className="max-w-7xl mx-auto flex flex-col relative z-10">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
-            <p className="text-gray-400 text-sm">Your Complete Study Hub - Stay Focused, Stay Organized</p>
-          </div>
-          {/* Widget Grid */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
-            {/* Current Time Widget */}
-            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-accent-white" />
-                <span className="text-gray-300 text-sm font-medium">Time</span>
-              </div>
-              <div className="text-xl font-bold text-white">
-                {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-              </div>
-              <div className="text-gray-400 text-xs">
-                {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
-              </div>
+      <div className="stars" /> {/* Starry background element */}
+      <div className="max-w-7xl mx-auto flex flex-col relative z-10">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
+          <p className="text-white-400 text-sm">studying made simple.</p>
+        </div>
+        {/* Widget Grid */}
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
+          {/* Current Time Widget */}
+          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-4 h-4 text-accent-white" />
+              <span className="text-gray-300 text-sm font-medium">Time</span>
             </div>
+            <div className="text-xl font-bold text-white">
+              {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </div>
+            <div className="text-gray-400 text-xs">
+              {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
+            </div>
+          </div>
 
             {/* Weather Widget */}
             <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
