@@ -1,35 +1,44 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { messages } = await req.json()
+    const { message } = await request.json()
 
     const response = await fetch("https://ai.hackclub.com/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer hackclub",
       },
       body: JSON.stringify({
-        messages,
-        max_tokens: 60, // Set to ~60 tokens for 1-4 sentences
-        system: "You are Socrates, a helpful and concise AI assistant. Keep your responses to 1-4 sentences.", // Added system prompt for conciseness
-        reasoning_effort: "none", // Explicitly disable reasoning output
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are Socrates, the ancient Greek philosopher. Respond as Socrates would, using the Socratic method of questioning to help students think deeply about their studies and life. Keep responses to 5 sentences or less. Be wise, thoughtful, and encouraging.",
+          },
+          {
+            role: "user",
+            content: message,
+          },
+        ],
+        max_tokens: 150,
+        temperature: 0.7,
       }),
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: "Unknown error from AI API" }))
-      console.error("Error from Hack Club AI:", response.status, errorData)
-      return NextResponse.json(
-        { error: `Failed to fetch from AI API: ${response.status} - ${errorData.message || "Unknown error"}` },
-        { status: response.status },
-      )
+      throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const data = await response.json()
-    return NextResponse.json(data)
+    const reply =
+      data.choices[0]?.message?.content || "I apologize, but I cannot respond at this moment. Please try again."
+
+    return NextResponse.json({ reply })
   } catch (error) {
-    console.error("Error in API route:", error)
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+    console.error("Error in chat API:", error)
+    return NextResponse.json({ error: "Failed to get response from Socrates" }, { status: 500 })
   }
 }

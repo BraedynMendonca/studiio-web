@@ -1,23 +1,36 @@
 "use client"
 
-import { useState, useEffect, use } from "react"
-import { Trash2, Play, Pause, Square, Cloud, Sun, Clock, Calculator, Coffee, PenTool, LayoutList, Headphones, Timer, Music } from "lucide-react"
+import { useState, useEffect } from "react"
+import {
+  Trash2,
+  Play,
+  Pause,
+  Square,
+  Cloud,
+  Sun,
+  Clock,
+  Calculator,
+  Coffee,
+  PenTool,
+  LayoutList,
+  Headphones,
+  Timer,
+  Music,
+} from "lucide-react"
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote" // Import the new component
-import { Input } from "@/components/ui/input"
-import { set } from "date-fns"
 import { Audio } from "@/components/audio"
 import {
   redirectToSpotifyAuth,
   getSpotifyToken,
   logout,
-  getUserProfile,
   getUserPlaylists,
   getPlaylistTracks,
+  isSpotifyConfigured,
 } from "@/components/spotifyPanel/utils"
 import { Player } from "@/components/spotifyPanel/Player"
 
-import { ColorPaletteSelector } from "@/components/ColorThemePicker"; //Import the Color theme picker componenet
+import { ColorPaletteSelector } from "@/components/ColorThemePicker" //Import the Color theme picker componenet
 
 export default function StudiioHomepage() {
   // Timer state
@@ -57,10 +70,12 @@ export default function StudiioHomepage() {
   const [newReminder, setNewReminder] = useState("")
 
   // Weather state
-  const [temp, setTemp] = useState<any>(null)
-  const [condition, setCondition] = useState<any>(null)
-  const [city, setCity] = useState<any>(null)
-  const [zip, setZip] = useState<any>(localStorage.getItem("zip") || 10002)
+  const [temp, setTemp] = useState<string>("Loading...")
+  const [condition, setCondition] = useState<string>("Loading weather...")
+  const [city, setCity] = useState<string>("")
+  const [zip, setZip] = useState<string>(
+    typeof window !== "undefined" ? localStorage.getItem("zip") || "10002" : "10002",
+  )
 
   // Spotify state
   const [spotifyToken, setSpotifyToken] = useState<any>(null)
@@ -122,41 +137,43 @@ export default function StudiioHomepage() {
   useEffect(() => {
     const fetchSpotifyToken = async () => {
       try {
-        const token = await getSpotifyToken();
-        setSpotifyToken(token);
+        const token = await getSpotifyToken()
+        setSpotifyToken(token)
       } catch (error) {
         // Token fetch failed - this is fine for initial load
       }
-    };
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-
-    if (code) {
-      fetchSpotifyToken();
     }
-  }, []);
+
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get("code")
+
+      if (code) {
+        fetchSpotifyToken()
+      }
+    }
+  }, [])
 
   // Monitor trackUris changes
   useEffect(() => {
-    console.log('Track URIs updated:', trackUris);
-  }, [trackUris]);
+    console.log("Track URIs updated:", trackUris)
+  }, [trackUris])
 
   // Fetch playlists when token is available
   useEffect(() => {
     const fetchPlaylists = async () => {
-      if (localStorage.getItem("access_token")) {
+      if (typeof window !== "undefined" && localStorage.getItem("access_token")) {
         try {
-          const userPlaylists = await getUserPlaylists();
-          console.log("items:", userPlaylists);
-          setPlaylists(userPlaylists);
+          const userPlaylists = await getUserPlaylists()
+          console.log("items:", userPlaylists)
+          setPlaylists(userPlaylists)
         } catch (error) {
-          setPlaylists([]);
+          setPlaylists([])
         }
       }
-    };
+    }
 
-    fetchPlaylists();
+    fetchPlaylists()
   }, [spotifyToken])
 
   // Timer functions
@@ -267,35 +284,42 @@ export default function StudiioHomepage() {
     )
   }
 
-  const getWeatherData = async (countryCode: string = 'us') => {
-    let API_KEY: any = process.env.NEXT_PUBLIC_WEATHER_API_KEY
-    const url: string = `https://api.openweathermap.org/data/2.5/weather?zip=${zip},${countryCode}&appid=${API_KEY}`
-
+  const getWeatherData = async (countryCode = "us") => {
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        setTemp("error fetching weather")
-        setCondition(`error getting weather for zip ${zip}`)
-        setCity("")
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
+      const response = await fetch(`/api/weather?zip=${zip}&country=${countryCode}`)
 
-      setTemp(`${((data.main.temp - 273.15) * 1.8 + 32).toFixed(1)} °F`)
-      setCondition(data.weather[0].description.replace(/\b\w/g, c => c.toUpperCase()))
-      setCity(data.name)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+
+      if (data.error) {
+        setTemp("Weather unavailable")
+        setCondition(data.error)
+        setCity("")
+      } else {
+        setTemp(data.temp)
+        setCondition(data.condition)
+        setCity(data.city)
+      }
     } catch (error) {
-      return "error fetching weather"
+      console.error("Weather fetch error:", error)
+      setTemp("Weather unavailable")
+      setCondition("Unable to load weather")
+      setCity("")
     }
   }
 
   useEffect(() => {
-    getWeatherData('us')
+    getWeatherData("us")
   }, [])
 
   useEffect(() => {
-    localStorage.setItem("zip", zip)
-    getWeatherData('us')
+    if (typeof window !== "undefined") {
+      localStorage.setItem("zip", zip)
+      getWeatherData("us")
+    }
   }, [zip])
 
   const [linkName, setLinkName] = useState("")
@@ -315,44 +339,38 @@ export default function StudiioHomepage() {
       return
     }
 
-    setLinks((prev) => [
-      ...prev,
-      { id: Date.now(), name: linkName.trim(), url: linkURL.trim() },
-    ])
+    setLinks((prev) => [...prev, { id: Date.now(), name: linkName.trim(), url: linkURL.trim() }])
   }
 
   const removeLink = (id: number) => {
     setLinks((prev) => prev.filter((link) => link.id !== id))
   }
 
-
   return (
     <div id="app-container" className="min-h-screen transition-colors duration-300 pt-6 pb-6">
-
       <div id="app-container" className="min-h-screen transition-colors duration-300">
-
-      <div className="stars" /> {/* Starry background element */}
-      <div className="max-w-7xl mx-auto flex flex-col relative z-10">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
-          <p className="text-white-400 text-sm">studying made simple.</p>
-        </div>
-        {/* Widget Grid */}
-        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
-          {/* Current Time Widget */}
-          <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-4 h-4 text-accent-white" />
-              <span className="text-gray-300 text-sm font-medium">Time</span>
-            </div>
-            <div className="text-xl font-bold text-white">
-              {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </div>
-            <div className="text-gray-400 text-xs">
-              {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
-            </div>
+        <div className="stars" /> {/* Starry background element */}
+        <div className="max-w-7xl mx-auto flex flex-col relative z-10">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
+            <p className="text-white-400 text-sm">studying made simple.</p>
           </div>
+          {/* Widget Grid */}
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
+            {/* Current Time Widget */}
+            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-accent-white" />
+                <span className="text-gray-300 text-sm font-medium">Time</span>
+              </div>
+              <div className="text-xl font-bold text-white">
+                {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </div>
+              <div className="text-gray-400 text-xs">
+                {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
+              </div>
+            </div>
 
             {/* Weather Widget */}
             <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
@@ -373,8 +391,8 @@ export default function StudiioHomepage() {
                 type="text"
                 placeholder="Enter ZIP code and press Enter"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    setZip(e.target.value)
+                  if (e.key === "Enter") {
+                    setZip((e.target as HTMLInputElement).value)
                   }
                 }}
                 className="flex-1 bg-input-bg border border-input-border rounded-xl px-3 py-2 text-white text-xs placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent-white"
@@ -388,7 +406,9 @@ export default function StudiioHomepage() {
                 <span className="text-gray-300 text-sm font-medium">Pomodoro Timer</span>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">{formatTime(timeLeft)}</div>
+                <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">
+                  {formatTime(timeLeft)}
+                </div>
                 <div className="text-gray-400 text-xs mb-3">
                   {isBreak ? "Break Time" : "Work Time"} • Session {sessionCount}
                 </div>
@@ -446,13 +466,11 @@ export default function StudiioHomepage() {
               </div>
               <div className="grid grid-cols-2 gap-2 mb-3 flex-1">
                 {[
-                  ["Rain", "/audio/rain.mp3"],
-                  ["Vibe", "/audio/vibes.mp3"],
-                  ["Nature", "/audio/nature.mp3"],
-                  ["White", "/audio/whitenoise.mp3"],
-                ].map((sound) => (
-                  Audio(sound[1], sound[0])
-                ))}
+                  ["Rain", "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_syqWhZkmI8lj18redM9IyJxmMS3Q/VPjukmNqICQI9QqUDI7RBf/public/audio/rain.mp3"],
+                  ["Vibe", "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_syqWhZkmI8lj18redM9IyJxmMS3Q/nu9OXtUthheyEPoFyS0_R9/public/audio/vibes.mp3"],
+                  ["Nature", "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_syqWhZkmI8lj18redM9IyJxmMS3Q/qoXNYI0MAJRZlYwvAUZX0r/public/audio/nature.mp3"],
+                  ["White", "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/git-blob/prj_syqWhZkmI8lj18redM9IyJxmMS3Q/PSYa0fLpxVIUtLf-Q6T74Z/public/audio/whitenoise.mp3"],
+                ].map((sound) => Audio(sound[1], sound[0]))}
               </div>
               {currentSound && isPlaying && (
                 <div className="text-xs text-gray-300 text-center animate-pulse">♪ {currentSound}</div>
@@ -640,11 +658,7 @@ export default function StudiioHomepage() {
               </div>
 
               <ul className="flex flex-col gap-2 text-[13px]">
-                {links.length === 0 && (
-                  <li className="text-gray-500 text-xs italic text-center">
-                    No links added yet
-                  </li>
-                )}
+                {links.length === 0 && <li className="text-gray-500 text-xs italic text-center">No links added yet</li>}
                 {links.map(({ id, name, url }) => (
                   <li
                     key={id}
@@ -697,59 +711,58 @@ export default function StudiioHomepage() {
             </div>
 
             {/* Spotify Widget */}
-            <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
-              <div className="flex items-center gap-2 mb-2">
-                <Music className="w-4 h-4 text-accent-white" />
-                <span className="text-gray-300 text-sm font-medium">Spotify</span>
-              </div>
+            {isSpotifyConfigured() && (
+              <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
+                <div className="flex items-center gap-2 mb-2">
+                  <Music className="w-4 h-4 text-accent-white" />
+                  <span className="text-gray-300 text-sm font-medium">Spotify</span>
+                </div>
 
-              {localStorage.getItem("access_token") ? (
-                <div className="flex flex-col gap-2 flex-1">
-                  <div>
-                    <div className="text-xs text-gray-300 mb-2">
-                      Connected to Spotify
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      {
-                        playlists.map(playlist => (
+                {typeof window !== "undefined" && localStorage.getItem("access_token") ? (
+                  <div className="flex flex-col gap-2 flex-1">
+                    <div>
+                      <div className="text-xs text-gray-300 mb-2">Connected to Spotify</div>
+                      <div className="flex flex-col gap-2">
+                        {playlists.map((playlist) => (
                           <button
+                            key={playlist.id}
                             onClick={async () => {
-                              const tracks = await getPlaylistTracks(playlist.id);
-                              setTrackUris(tracks);
+                              const tracks = await getPlaylistTracks(playlist.id)
+                              setTrackUris(tracks)
                             }}
                             className="bg-gray-600 hover:bg-button-hover-bg text-white px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md"
                           >
                             {playlist.name}
                           </button>
                         ))}
+                      </div>
                     </div>
+                    <div className="mt-auto">
+                      <Player uris={trackUris} />
+                    </div>
+                    <button
+                      onClick={logout}
+                      className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md mt-2"
+                    >
+                      Disconnect
+                    </button>
                   </div>
-                  <div className="mt-auto">
-                    <Player uris={trackUris} />
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <div className="text-xs text-gray-400">
+                      Connect your Spotify account to control playback (Requires Premium)
+                    </div>
+                    <button
+                      onClick={() => redirectToSpotifyAuth()}
+                      className="bg-[#1DB954]/20 hover:bg-[#1DB954]/30 text-[#1DB954] px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md flex items-center justify-center gap-2"
+                    >
+                      <Music className="w-3 h-3" />
+                      Connect Spotify
+                    </button>
                   </div>
-                  <button
-                    onClick={logout}
-                    className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md mt-2"
-                  >
-                    Disconnect
-                  </button>
-
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <div className="text-xs text-gray-400">
-                    Connect your Spotify account to control playback (Requires Premium)
-                  </div>
-                  <button
-                    onClick={() => redirectToSpotifyAuth()}
-                    className="bg-[#1DB954]/20 hover:bg-[#1DB954]/30 text-[#1DB954] px-3 py-1.5 rounded-xl text-xs transition-all duration-200 shadow-md flex items-center justify-center gap-2"
-                  >
-                    <Music className="w-3 h-3" />
-                    Connect Spotify
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

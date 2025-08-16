@@ -1,285 +1,218 @@
+@import url("https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    --background: 0 0% 5%; /* Very dark gray/black */
-    --foreground: 0 0% 98%; /* White */
-    --card: 210 15% 20%; /* Steel blue for cards */
-    --card-foreground: 0 0% 98%; /* White */
-    --border: 0 0% 0%; /* Black for outlines */
-    --input-bg: 210 15% 15%; /* Darker steel blue for inputs */
-    --input-border: 210 15% 25%;
-    --accent-white: 0 0% 90%; /* Off-white for accents */
-    --accent-light-gray: 0 0% 60%; /* Lighter gray for secondary accents */
-    --button-bg: 210 15% 35%; /* Lighter steel blue for buttons for better contrast */
-    --button-hover-bg: 210 15% 45%; /* Even lighter on hover */
-    --button-text: 0 0% 98%;
-    --radius: 1rem;
-  }
+:root {
+  --bg-dark: #0a0a0a;
+  --text-light: #ffffff;
+  --accent-white: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.08);
+  --input-border: rgba(255, 255, 255, 0.15);
+  --button-bg: rgba(255, 255, 255, 0.1);
+  --button-hover-bg: rgba(255, 255, 255, 0.15);
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    /* Removed overflow: hidden; to enable scrolling */
-    position: relative;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Starry background animation */
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  overflow-x: hidden;
+}
+
 .stars {
-  position: fixed; /* Use fixed to cover entire viewport */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: transparent;
-  z-index: -1;
-  animation: animateStars 100s linear infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* Generate stars using box-shadow */
 .stars::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  width: 1px;
-  height: 1px;
-  background: white;
-  /* Small stars */
-  box-shadow:
-    10px 10px #fff, 20px 30px #fff, 50px 80px #fff, 120px 150px #fff, 180px 20px #fff, 250px 100px #fff, 300px 250px #fff, 350px 50px #fff, 400px 180px #fff, 450px 300px #fff, 500px 10px #fff, 550px 200px #fff, 600px 300px #fff, 650px 80px #fff, 700px 220px #fff, 750px 10px #fff, 800px 150px #fff, 850px 280px #fff, 900px 50px #fff, 950px 200px #fff,
-    10px 400px #fff, 60px 450px #fff, 110px 500px #fff, 160px 550px #fff, 210px 600px #fff, 260px 650px #fff, 310px 700px #fff, 360px 750px #fff, 410px 800px #fff, 460px 850px #fff, 510px 900px #fff, 560px 950px #fff, 610px 400px #fff, 660px 450px #fff, 710px 500px #fff, 760px 550px #fff, 810px 600px #fff, 860px 650px #fff, 910px 700px #fff, 960px 750px #fff,
-    /* Medium stars */
-    15px 15px 1px #fff, 25px 35px 1px #fff, 55px 85px 1px #fff, 125px 155px 1px #fff, 185px 25px 1px #fff, 255px 105px 1px #fff, 305px 255px 1px #fff, 355px 55px 1px #fff, 405px 185px 1px #fff, 455px 305px 1px #fff, 505px 15px 1px #fff, 555px 205px 1px #fff, 605px 305px 1px #fff, 655px 85px 1px #fff, 705px 225px 1px #fff, 755px 15px 1px #fff, 805px 155px 1px #fff, 855px 285px 1px #fff, 905px 55px 1px #fff, 955px 205px 1px #fff,
-    15px 415px 1px #fff, 65px 465px 1px #fff, 115px 515px 1px #fff, 165px 565px 1px #fff, 215px 615px 1px #fff, 265px 665px 1px #fff, 315px 715px 1px #fff, 365px 765px 1px #fff, 415px 815px 1px #fff, 465px 865px 1px #fff, 515px 915px 1px #fff, 565px 965px 1px #fff, 615px 415px 1px #fff, 665px 465px 1px #fff, 715px 515px 1px #fff, 765px 565px 1px #fff, 815px 615px 1px #fff, 865px 665px 1px #fff, 915px 715px 1px #fff, 965px 765px 1px #fff,
-    /* Large stars */
-    30px 30px 2px #fff, 40px 60px 2px #fff, 70px 100px 2px #fff, 140px 170px 2px #fff, 200px 40px 2px #fff, 270px 120px 2px #fff, 320px 270px 2px #fff, 370px 70px 2px #fff, 420px 200px 2px #fff, 470px 320px 2px #fff, 520px 30px 2px #fff, 570px 220px 2px #fff, 620px 320px 2px #fff, 670px 100px 2px #fff, 720px 240px 2px #fff, 770px 30px 2px #fff, 820px 170px 2px #fff, 870px 300px 2px #fff, 920px 70px 2px #fff, 970px 220px 2px #fff,
-    30px 430px 2px #fff, 80px 480px 2px #fff, 130px 530px 2px #fff, 180px 580px 2px #fff, 230px 630px 2px #fff, 280px 680px 2px #fff, 330px 730px 2px #fff, 380px 780px 2px #fff, 430px 830px 2px #fff, 480px 880px 2px #fff, 530px 930px 2px #fff, 580px 980px 2px #fff, 630px 430px 2px #fff, 680px 480px 2px #fff, 730px 530px 2px #fff, 780px 580px 2px #fff, 830px 630px 2px #fff, 880px 680px 2px #fff, 930px 730px 2px #fff, 980px 780px 2px #fff;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: sparkle 20s linear infinite;
 }
 
-@keyframes animateStars {
+@keyframes sparkle {
   from {
-    transform: translateY(0);
+    transform: translateX(0);
   }
   to {
-    transform: translateY(-1000px);
-  } /* Adjust based on star density */
+    transform: translateX(-200px);
+  }
 }
 
-/* Custom scrollbar for dark theme */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-/* Enhanced transitions and animations */
-button,
-input,
-select,
-textarea {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-button:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-}
-
-/* Widget hover effects with subtle shadows */
 .widget-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .widget-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
 }
 
-/* No more colorful glows, just subtle white */
-.glow-white {
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-}
-
-/* No more animated gradients on elements */
-.animated-gradient {
-  animation: none;
-  background-size: auto;
-}
-
-/* Pulsing animations for active elements (subtle white) */
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.02);
-  }
-}
-
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-/* Floating animation (keep if desired, but make subtle) */
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-.float {
-  animation: float 2s ease-in-out infinite;
-}
-
-/* Enhanced focus states */
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
-  outline: none;
-  ring: 2px;
-  ring-color: var(--accent-white);
-  ring-offset: 2px;
-  ring-offset-color: var(--background);
-}
-
-/* Backdrop blur enhancement */
-.backdrop-blur {
-  backdrop-filter: blur(8px) saturate(150%);
-}
-
-/* Text glow effects (make subtle white) */
-.text-glow {
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-}
-
-/* No more gradient text animations */
-.gradient-text {
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  background-clip: unset;
-  animation: none;
-  color: var(--text-primary); /* Set to white */
-}
-
-/* Enhanced shadow effects (subtle dark) */
-.shadow-glow {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-/* Smooth color transitions for all elements */
-* {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow, transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
-
-/* Custom checkbox styling for white accents */
-input[type="checkbox"] {
-  appearance: none;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
-  border-radius: 0.25rem;
-  width: 1rem;
-  height: 1rem;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-input[type="checkbox"]:checked {
-  background: var(--accent-white);
-  border-color: var(--accent-white);
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-}
-
-input[type="checkbox"]:checked::after {
-  content: "✓";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--background); /* Dark checkmark on white */
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-shadow: none;
-}
-
-/* Ensure text input fields have dark background and light text */
-input[type="text"],
-input[type="number"],
-textarea {
-  background-color: var(--input-bg) !important; /* Force dark background */
-  color: var(--foreground) !important; /* Force light text */
-}
-
-/* Adjust placeholder color for better visibility on dark backgrounds */
-input::placeholder,
-textarea::placeholder {
-  color: var(--accent-light-gray) !important; /* Use a lighter gray for placeholders */
-}
-
-/* Outline for calculator buttons - now using theme border color */
 .calc-button-outline {
-  border: 2px solid var(--border) !important; /* Increased border width to 2px */
+  border: 1px solid rgba(0, 0, 0, 0.8);
 }
 
-/* Mobile responsiveness - ensure no scrolling */
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-  }
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
 
-  .md\:col-span-2 {
-    grid-column: span 2;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
-@media (max-width: 640px) {
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+@keyframes pulse-medium {
+  0%,
+  100% {
+    opacity: 0.5;
   }
-
-  .md\:col-span-2 {
-    grid-column: span 1;
+  50% {
+    opacity: 0.9;
   }
 }
 
-/* Ensure content fits viewport */
-.min-h-screen {
-  min-height: 100vh; /* Changed from height: 100vh; max-height: 100vh; */
+@keyframes pulse-fast {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-pulse-medium {
+  animation: pulse-medium 3s ease-in-out infinite;
+}
+
+.animate-pulse-fast {
+  animation: pulse-fast 2s ease-in-out infinite;
+}
+
+/* Color theme variables */
+.theme-default {
+  --bg-dark: #0a0a0a;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.08);
+  --input-border: rgba(255, 255, 255, 0.15);
+  --button-bg: rgba(255, 255, 255, 0.1);
+  --button-hover-bg: rgba(255, 255, 255, 0.15);
+}
+
+.theme-blue {
+  --bg-dark: #0f1419;
+  --card-bg: rgba(59, 130, 246, 0.1);
+  --border-color: rgba(59, 130, 246, 0.2);
+  --input-bg: rgba(59, 130, 246, 0.08);
+  --input-border: rgba(59, 130, 246, 0.15);
+  --button-bg: rgba(59, 130, 246, 0.15);
+  --button-hover-bg: rgba(59, 130, 246, 0.25);
+}
+
+.theme-purple {
+  --bg-dark: #1a0f1a;
+  --card-bg: rgba(147, 51, 234, 0.1);
+  --border-color: rgba(147, 51, 234, 0.2);
+  --input-bg: rgba(147, 51, 234, 0.08);
+  --input-border: rgba(147, 51, 234, 0.15);
+  --button-bg: rgba(147, 51, 234, 0.15);
+  --button-hover-bg: rgba(147, 51, 234, 0.25);
+}
+
+.theme-green {
+  --bg-dark: #0f1a0f;
+  --card-bg: rgba(34, 197, 94, 0.1);
+  --border-color: rgba(34, 197, 94, 0.2);
+  --input-bg: rgba(34, 197, 94, 0.08);
+  --input-border: rgba(34, 197, 94, 0.15);
+  --button-bg: rgba(34, 197, 94, 0.15);
+  --button-hover-bg: rgba(34, 197, 94, 0.25);
+}
+
+.theme-red {
+  --bg-dark: #1a0f0f;
+  --card-bg: rgba(239, 68, 68, 0.1);
+  --border-color: rgba(239, 68, 68, 0.2);
+  --input-bg: rgba(239, 68, 68, 0.08);
+  --input-border: rgba(239, 68, 68, 0.15);
+  --button-bg: rgba(239, 68, 68, 0.15);
+  --button-hover-bg: rgba(239, 68, 68, 0.25);
+}
+
+#app-container {
+  background: var(--bg-dark);
+  padding: 1rem;
+}
+
+.bg-card {
+  background: var(--card-bg);
+}
+
+.border-border {
+  border-color: var(--border-color);
+}
+
+.bg-input-bg {
+  background: var(--input-bg);
+}
+
+.border-input-border {
+  border-color: var(--input-border);
+}
+
+.bg-button-bg {
+  background: var(--button-bg);
+}
+
+.bg-button-hover-bg {
+  background: var(--button-hover-bg);
 }

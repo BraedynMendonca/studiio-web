@@ -1,32 +1,38 @@
-'use client'
+"use client"
 
-import SpotifyPlayer from 'react-spotify-web-playback';
-import React from 'react';
+import { useState, useEffect } from "react"
+import SpotifyPlayer from "react-spotify-web-playback"
 
 interface PlayerProps {
-    uris: string[];
+  uris: string[]
 }
 
 export function Player({ uris }: PlayerProps) {
-    const token = localStorage.getItem('access_token');
+  const [token, setToken] = useState<string>("")
 
-    if (!token || !uris || uris.length === 0) {
-        return null;
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const accessToken = localStorage.getItem("access_token")
+      setToken(accessToken || "")
     }
+  }, [])
 
-    return (
-        <SpotifyPlayer
-            token={token}
-            uris={uris}
-            play={true}
-            magnifySliderOnHover={true}
-            styles={{
-                bgColor: 'transparent',
-                color: '#fff',
-                sliderColor: '#1db954',
-                trackArtistColor: '#b3b3b3',
-                trackNameColor: '#fff',
-            }}
-        />
-    );
+  if (!token) return null
+
+  return (
+    <SpotifyPlayer
+      token={token}
+      uris={uris}
+      play={uris.length > 0}
+      styles={{
+        activeColor: "#fff",
+        bgColor: "#333",
+        color: "#fff",
+        loaderColor: "#fff",
+        sliderColor: "#1cb954",
+        trackArtistColor: "#ccc",
+        trackNameColor: "#fff",
+      }}
+    />
+  )
 }

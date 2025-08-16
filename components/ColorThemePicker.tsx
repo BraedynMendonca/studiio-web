@@ -1,63 +1,67 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+import { Palette } from "lucide-react"
 
-const COLORS = [
-  { name: "Sakura Pink", hex: "#F472B6" },
-  { name: "Ocean Blue", hex: "#3B82F6" },
-  { name: "Mint Green", hex: "#34D399" },
-  { name: "Sunset Orange", hex: "#FB923C" },
-  { name: "Lavender Purple", hex: "#A78BFA" },
-  { name: "Lemon Yellow", hex: "#FACC15" },
-  { name: "Sky Teal", hex: "#2DD4BF" },
-  { name: "Rose Red", hex: "#E11D48" },
+const themes = [
+  { name: "Default", class: "theme-default", color: "#ffffff" },
+  { name: "Blue", class: "theme-blue", color: "#3b82f6" },
+  { name: "Purple", class: "theme-purple", color: "#9333ea" },
+  { name: "Green", class: "theme-green", color: "#22c55e" },
+  { name: "Red", class: "theme-red", color: "#ef4444" },
 ]
 
 export function ColorPaletteSelector() {
-  const [selectedColor, setSelectedColor] = useState<string | null>(null)
+  const [selectedTheme, setSelectedTheme] = useState("theme-default")
 
-  // When page loads, apply stored color
   useEffect(() => {
-    const savedColor = localStorage.getItem("selectedColor")
-    if (savedColor) {
-      setSelectedColor(savedColor)
-      updateContainerColor(savedColor)
-    }
+    // Load saved theme from localStorage
+    const savedTheme = localStorage.getItem("studiio-theme") || "theme-default"
+    setSelectedTheme(savedTheme)
+    applyTheme(savedTheme)
   }, [])
 
-  // Directly apply color to #app-container
-  const updateContainerColor = (color: string) => {
+  const applyTheme = (themeClass: string) => {
     const container = document.getElementById("app-container")
     if (container) {
-      container.style.backgroundColor = color
-    } else {
-      console.warn("App container not found")
+      // Remove all theme classes
+      themes.forEach((theme) => {
+        container.classList.remove(theme.class)
+      })
+      // Add selected theme class
+      container.classList.add(themeClass)
     }
   }
 
-  const handleColorClick = (color: string) => {
-    setSelectedColor(color)
-    localStorage.setItem("selectedColor", color)
-    updateContainerColor(color)
+  const handleThemeChange = (themeClass: string) => {
+    setSelectedTheme(themeClass)
+    applyTheme(themeClass)
+    localStorage.setItem("studiio-theme", themeClass)
   }
 
   return (
-    <div className="rounded-2xl border border-border p-6 h-[540px] flex flex-col shadow-lg widget-hover bg-[#2a333b]">
-      <div className="text-gray-300 text-sm font-medium mb-4">Choose a color theme</div>
-      <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-        {COLORS.map((color, index) => (
-          <div
-            key={index}
-            onClick={() => handleColorClick(color.hex)}
-            style={{
-              backgroundColor: color.hex,
-              borderColor: selectedColor === color.hex ? "#ffffff" : "transparent",
-            }}
-            className="rounded-xl w-full h-20 cursor-pointer border-2 px-4 py-3 flex items-center justify-between transition-all"
-          >
-            <span className="text-white font-medium drop-shadow">{color.name}</span>
-          </div>
+    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col shadow-lg widget-hover">
+      <div className="flex items-center gap-2 mb-3">
+        <Palette className="w-4 h-4 text-accent-white" />
+        <span className="text-gray-300 text-sm font-medium">Theme</span>
+      </div>
+
+      <div className="grid grid-cols-5 gap-2">
+        {themes.map((theme) => (
+          <button
+            key={theme.class}
+            onClick={() => handleThemeChange(theme.class)}
+            className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
+              selectedTheme === theme.class ? "border-white scale-110" : "border-gray-600 hover:border-gray-400"
+            }`}
+            style={{ backgroundColor: theme.color }}
+            title={theme.name}
+          />
         ))}
+      </div>
+
+      <div className="text-xs text-gray-400 mt-2 text-center">
+        {themes.find((t) => t.class === selectedTheme)?.name} Theme
       </div>
     </div>
   )

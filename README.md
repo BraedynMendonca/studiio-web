@@ -1,32 +1,42 @@
-# Studiio Homepage Design
+# Studiio
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+A modern study platform built with Next.js and React.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/pingmeherealways-2881s-projects/v0-studiio-homepage-design)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/5nWZCaIzrXL)
+## Features
 
-#Official Link: https://studiio.xyz/
+- Pomodoro Timer
+- Quick Notes
+- Study Sounds
+- Weather Widget
+- Calculator
+- AI Chatbot (Socrates)
+- Inspiration Quotes
+- Links & Resources
+- Color Theme Picker
+- Spotify Integration
 
-## Overview
+## Getting Started
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+First, run the development server:
 
-## Deployment
+\`\`\`bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+\`\`\`
 
-Your project is live at:
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-**[https://vercel.com/pingmeherealways-2881s-projects/v0-studiio-homepage-design](https://vercel.com/pingmeherealways-2881s-projects/v0-studiio-homepage-design)**
+## Environment Variables
 
-## Build your app
+For full functionality, you'll need to set up the following environment variables:
 
-Continue building your app on:
+- `WEATHER_API_KEY` - OpenWeatherMap API key (server-side only)
+- `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` - Spotify Client ID (optional)
+- `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` - Spotify Redirect URI (optional)
 
-**[https://v0.dev/chat/projects/5nWZCaIzrXL](https://v0.dev/chat/projects/5nWZCaIzrXL)**
+## Contributing
 
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
