@@ -47,12 +47,12 @@ export function PomodoroTimer() {
   }
 
   return (
-    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 md:col-span-2 lg:col-span-1 flex flex-col justify-center shadow-lg widget-hover">
+    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover flex-1" style={{ height:'100%', justifyContent:'flex-start' }}>
       <div className="flex items-center gap-2 mb-3">
         <Timer className="w-4 h-4 text-gray-300" />
         <span className="text-gray-300 text-sm font-medium">Pomodoro Timer</span>
       </div>
-      <div className="text-center">
+      <div className="text-center flex-1">
         <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">
           {formatTime(timeLeft)}
         </div>

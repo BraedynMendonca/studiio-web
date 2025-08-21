@@ -1,17 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import {
-  Trash2,
-  Cloud,
-  Sun,
-  Clock,
-  PenTool,
-  LayoutList,
-  Headphones,
-  Music,
-} from "lucide-react"
-import { closestCorners, DndContext } from '@dnd-kit/core'
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote"
 import { ColorPaletteSelector } from "@/components/ColorThemePicker"
@@ -25,9 +14,33 @@ import { StudySoundsWidget } from "@/components/studySoundsWidget"
 import { WeatherWidget } from "@/components/weatherWidget"
 import { TemplateWidget } from "@/components/widgetTemplate"
 
-
+import GridLayout from "react-grid-layout"
+import { Wrench, NotepadText } from "lucide-react"
 
 export default function StudiioHomepage() {
+  const [isEditing, setIsEditing] = useState(false)
+
+  const widgetList = [
+    CurrentTimeWidget,    //0
+    PomodoroTimer,        //1
+    WeatherWidget,        //2
+    QuickNotesWidget,     //3
+    StudySoundsWidget,    //4
+    SocratesChatbot,      //5
+    BreakTimer,           //6
+    CalculatorWidget,     //7
+    InspirationQuote,     //8
+    ColorPaletteSelector, //9
+    LinksWidget           //10
+  ]
+
+  const layout = [
+    { i: '0', x: 0, y: 0, w: 2, h: 1, }, { i: '1', x: 2, y: 0, w: 2, h: 1.7 }, { i: '2', x: 4, y: 0, w: 2, h: 1.7 },
+    { i: '3', x: 0, y: 1, w: 2, h: 5 }, { i: '4', x: 2, y: 1.7, w: 2, h: 1.5 }, { i: '5', x: 4, y: 1, w: 2, h: 6 },
+    { i: '6', x: 0, y: 2, w: 2, h: 2 }, { i: '7', x: 2, y: 3.2, w: 2, h: 4 }, { i: '8', x: 4, y: 2, w: 2, h: 1.5 },
+    { i: '9', x: 0, y: 4, w: 2, h: 1.2 }, { i: '10', x: 2, y: 7.2, w: 2, h: 5 },
+  ]
+
   return (
     <div id="app-container" className="min-h-screen transition-colors duration-300 pt-6 pb-6">
       <div id="app-container" className="min-h-screen transition-colors duration-300">
@@ -37,24 +50,51 @@ export default function StudiioHomepage() {
             <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
             <p className="text-white-400 text-sm">studying made simple.</p>
           </div>
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-4">
-            <DndContext collisionDetection={closestCorners}>
-              <CurrentTimeWidget />
-              <WeatherWidget />
-              <PomodoroTimer />
-              <QuickNotesWidget />
-              <StudySoundsWidget />
-              <div className="h-[450px]">
-                <SocratesChatbot />
-              </div>
-              <BreakTimer />
-              <CalculatorWidget />
-              <InspirationQuote />
-              <ColorPaletteSelector />
-              <LinksWidget />
-              <TemplateWidget />
-            </DndContext>
+          <GridLayout 
+            className="layout"
+            layout={layout}
+            cols={6}
+            rowHeight={100}
+            width={1200}
+            isResizable={true}
+            isDraggable={isEditing}
+          >
+            {
+              widgetList.map((widget, id) => {
+                return (
+                  <div
+                    key={id.toString()}
+                  >
+                    {widget()}
+                  </div>
+                )
+              })
+            }
+          </GridLayout>
+          
+        <button 
+          onClick={() => { setIsEditing(!isEditing) }}
+          style={{
+            position: "fixed",
+            bottom: 20,
+            right: 20,
+          }}
+          title={isEditing? 'Stop Editing' : 'Edit'}
+        >
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: 999,
+            alignContent: 'center',
+            padding: 10
+          }}>
+            {
+              isEditing ?
+              <NotepadText style={{ color: 'black' }} />
+              :
+              <Wrench style={{ color: 'black' }} />
+            }
           </div>
+        </button>
         </div>
       </div>
     </div>
