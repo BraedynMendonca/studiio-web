@@ -52,7 +52,7 @@ export function PomodoroTimer() {
         <Timer className="w-4 h-4 text-gray-300" />
         <span className="text-gray-300 text-sm font-medium">Pomodoro Timer</span>
       </div>
-      <div className="text-center flex-1">
+      <div className="text-center flex-1 flex flex-col justify-center">
         <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">
           {formatTime(timeLeft)}
         </div>
