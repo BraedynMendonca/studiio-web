@@ -17,8 +17,7 @@ import { StudySoundsWidget } from "@/components/studySoundsWidget"
 import { WeatherWidget } from "@/components/weatherWidget"
 import { TemplateWidget } from "@/components/widgetTemplate"
 
-import dynamic from "next/dynamic"
-const GridLayout = dynamic(() => import("react-grid-layout"), { ssr: false });
+import GridLayout from "react-grid-layout"
 import { Wrench, NotepadText } from "lucide-react"
 
 export default function StudiioHomepage() {
@@ -90,19 +89,17 @@ export default function StudiioHomepage() {
           }}
           title={isEditing? 'Stop Editing' : 'Edit'}
         >
-          <div 
-            className={`p-2 rounded-xl text-xs transition-all duration-200 shadow-md w-full bg-button-bg text-gray-300 hover:bg-button-hover-bg border border-border shadow-lg widget-hover`}
-            style={{
-              borderRadius: 999,
-              alignContent: 'center',
-              padding: 10
-            }}
-          >
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: 999,
+            alignContent: 'center',
+            padding: 10
+          }}>
             {
               isEditing ?
-              <NotepadText className="w-4 h-4 text-gray-300" />
+              <NotepadText style={{ color: 'black' }} />
               :
-              <Wrench className="w-4 h-4 text-gray-300" />
+              <Wrench style={{ color: 'black' }} />
             }
           </div>
         </button>
