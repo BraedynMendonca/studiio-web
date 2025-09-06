@@ -1,8 +1,5 @@
 "use client"
 
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
-
 import { useState, useEffect } from "react"
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote"
@@ -15,94 +12,101 @@ import { PomodoroTimer } from "@/components/pomodoroTimer"
 import { QuickNotesWidget } from "@/components/quickNotesWidget"
 import { StudySoundsWidget } from "@/components/studySoundsWidget"
 import { WeatherWidget } from "@/components/weatherWidget"
-import { TemplateWidget } from "@/components/widgetTemplate"
-
-import GridLayout from "react-grid-layout"
-import { Wrench, NotepadText } from "lucide-react"
 
 export default function StudiioHomepage() {
-  const [isEditing, setIsEditing] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  const widgetList = [
-    CurrentTimeWidget,    //0
-    PomodoroTimer,        //1
-    WeatherWidget,        //2
-    QuickNotesWidget,     //3
-    StudySoundsWidget,    //4
-    SocratesChatbot,      //5
-    BreakTimer,           //6
-    CalculatorWidget,     //7
-    InspirationQuote,     //8
-    ColorPaletteSelector, //9
-    LinksWidget           //10
-  ]
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
-  const layout = localStorage.getItem("layout") ?
-  JSON.parse(localStorage.getItem("layout"))
-  :
-  [
-    { i: '0', x: 0, y: 0, w: 2, h: 1, },                  { i: '1', x: 2, y: 0, w: 2, h: 2, minW: 2, minH: 2 },  { i: '2', x: 4, y: 0, w: 2, h: 2, minH: 2},
-    { i: '3', x: 0, y: 1, w: 2, h: 5, minH: 2 },          { i: '4', x: 2, y: 2, w: 2, h: 2, minH: 2 },           { i: '5', x: 4, y: 2, w: 2, h: 6, minW: 2, minH: 1 },
-    { i: '6', x: 0, y: 2, w: 2, h: 2, minH: 2, minW: 2 }, { i: '7', x: 2, y: 4, w: 2, h: 4, minH: 2 },           { i: '8', x: 4, y: 8, w: 2, h: 2, minW: 2, minH: 2 },
-    { i: '9', x: 0, y: 4, w: 2, h: 2, minH: 2 },          { i: '10', x: 2, y: 8, w: 2, h: 5, minW: 2, minH: 5 },
-  ]
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+          <p className="mt-4 text-white">Loading Studiio...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div id="app-container" className="min-h-screen transition-colors duration-300 pt-6 pb-6">
-      <div id="app-container" className="min-h-screen transition-colors duration-300">
-        <div className="stars" />
-        <div className="max-w-7xl mx-auto flex flex-col relative z-10">
-          <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-white mb-1">Studiio</h1>
-            <p className="text-white-400 text-sm">studying made simple.</p>
+      <div className="stars" />
+      <div className="max-w-7xl mx-auto flex flex-col relative z-10 px-4">
+        {/* Header with ProductHunt badge and title */}
+        <div className="flex items-center justify-between mb-6 relative">
+          {/* ProductHunt Badge - Left */}
+          <div className="flex-shrink-0">
+            <a
+              href="https://www.producthunt.com/products/studiio?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-studiio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block hover:opacity-80 transition-opacity"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1012236&theme=dark&t=1757179546827"
+                alt="Studiio - Personalized Study Dashboard for Students! | Product Hunt"
+                className="w-[200px] h-[43px] lg:w-[250px] lg:h-[54px]"
+                width="250"
+                height="54"
+              />
+            </a>
           </div>
-          <GridLayout 
-            className="layout"
-            layout={layout}
-            cols={6}
-            rowHeight={100}
-            width={1200}
-            isResizable={isEditing}
-            isDraggable={isEditing}
-            resizeHandles={['se']}
-            onLayoutChange={(layout) => { localStorage.setItem("layout", JSON.stringify(layout)) }}
-          >
-            {
-              widgetList.map((widget, id) => {
-                return (
-                  <div
-                    key={id.toString()}
-                  >
-                    {widget()}
-                  </div>
-                )
-              })
-            }
-          </GridLayout>
-          
-        <button 
-          onClick={() => { setIsEditing(!isEditing) }}
-          style={{
-            position: "fixed",
-            bottom: 20,
-            right: 20,
-          }}
-          title={isEditing? 'Stop Editing' : 'Edit'}
-        >
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: 999,
-            alignContent: 'center',
-            padding: 10
-          }}>
-            {
-              isEditing ?
-              <NotepadText style={{ color: 'black' }} />
-              :
-              <Wrench style={{ color: 'black' }} />
-            }
+
+          {/* Title - Center */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 text-center">
+            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">Studiio</h1>
+            <p className="text-white-400 text-xs lg:text-sm">studying made simple.</p>
           </div>
-        </button>
+
+          {/* Spacer for balance - Right */}
+          <div className="flex-shrink-0 w-[200px] lg:w-[250px]"></div>
+        </div>
+
+        {/* Widget Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-min">
+          {/* Row 1 */}
+          <div className="h-24">
+            <CurrentTimeWidget />
+          </div>
+          <div className="h-48 md:col-span-1 lg:col-span-1">
+            <PomodoroTimer />
+          </div>
+          <div className="h-48">
+            <WeatherWidget />
+          </div>
+          <div className="h-96 md:col-span-1 lg:col-span-1 xl:col-span-1 md:row-span-2">
+            <SocratesChatbot />
+          </div>
+
+          {/* Row 2 */}
+          <div className="h-96 md:col-span-1 lg:col-span-1 xl:col-span-1 md:row-span-2">
+            <QuickNotesWidget />
+          </div>
+          <div className="h-48">
+            <StudySoundsWidget />
+          </div>
+          <div className="h-48">
+            <BreakTimer />
+          </div>
+
+          {/* Row 3 */}
+          <div className="h-96 md:col-span-1 lg:col-span-1 xl:col-span-1 md:row-span-2">
+            <CalculatorWidget />
+          </div>
+          <div className="h-48">
+            <InspirationQuote />
+          </div>
+          <div className="h-48">
+            <ColorPaletteSelector />
+          </div>
+
+          {/* Row 4 */}
+          <div className="h-96 md:col-span-2 lg:col-span-2 xl:col-span-2">
+            <LinksWidget />
+          </div>
         </div>
       </div>
     </div>

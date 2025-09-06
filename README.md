@@ -33,9 +33,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 For full functionality, you'll need to set up the following environment variables:
 
-- `WEATHER_API_KEY` - OpenWeatherMap API key (server-side only)
+- `WEATHER_API_KEY` - OpenWeatherMap API key (configured in deployment)
 - `NEXT_PUBLIC_SPOTIFY_CLIENT_ID` - Spotify Client ID (optional)
 - `NEXT_PUBLIC_SPOTIFY_REDIRECT_URI` - Spotify Redirect URI (optional)
+
+Note: In the v0 preview environment, the weather API key is pre-configured for demonstration purposes.
 
 ## Contributing
 

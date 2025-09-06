@@ -13,15 +13,20 @@ const themes = [
 
 export function ColorPaletteSelector() {
   const [selectedTheme, setSelectedTheme] = useState("theme-default")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    // Load saved theme from localStorage
-    const savedTheme = localStorage.getItem("studiio-theme") || "theme-default"
-    setSelectedTheme(savedTheme)
-    applyTheme(savedTheme)
+    setMounted(true)
+    // Load saved theme from localStorage only after component mounts
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("studiio-theme") || "theme-default"
+      setSelectedTheme(savedTheme)
+      applyTheme(savedTheme)
+    }
   }, [])
 
   const applyTheme = (themeClass: string) => {
+    if (!mounted || typeof window === "undefined") return
     const container = document.getElementById("app-container")
     if (container) {
       // Remove all theme classes
@@ -34,13 +39,17 @@ export function ColorPaletteSelector() {
   }
 
   const handleThemeChange = (themeClass: string) => {
+    if (!mounted || typeof window === "undefined") return
     setSelectedTheme(themeClass)
     applyTheme(themeClass)
     localStorage.setItem("studiio-theme", themeClass)
   }
 
   return (
-    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover flex-1" style={{ height:'100%', justifyContent:'flex-start' }}>
+    <div
+      className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover flex-1"
+      style={{ height: "100%", justifyContent: "flex-start" }}
+    >
       <div className="flex items-center gap-2 mb-3">
         <Palette className="w-4 h-4 text-accent-white" />
         <span className="text-gray-300 text-sm font-medium">Theme</span>
@@ -61,7 +70,7 @@ export function ColorPaletteSelector() {
       </div>
 
       <div className="text-xs text-gray-400 mt-2 text-center">
-        {themes.find((t) => t.class === selectedTheme)?.name} Theme
+        {mounted ? themes.find((t) => t.class === selectedTheme)?.name : "Loading"} Theme
       </div>
     </div>
   )
