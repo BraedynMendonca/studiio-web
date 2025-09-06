@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
         Authorization: "Bearer hackclub",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-oss-20B",
         messages: [
           {
             role: "system",
