@@ -12,6 +12,7 @@ import { PomodoroTimer } from "@/components/pomodoroTimer"
 import { QuickNotesWidget } from "@/components/quickNotesWidget"
 import { StudySoundsWidget } from "@/components/studySoundsWidget"
 import { WeatherWidget } from "@/components/weatherWidget"
+import { Pomodoro } from "@/components/newPomodoroTimer"
 
 export default function StudiioHomepage() {
   const [mounted, setMounted] = useState(false)
@@ -90,6 +91,9 @@ export default function StudiioHomepage() {
           </div>
           <div className="h-48">
             <BreakTimer />
+          </div>
+          <div className="h-48">
+            <Pomodoro />
           </div>
 
           {/* Row 3 */}
