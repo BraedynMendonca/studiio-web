@@ -13,6 +13,7 @@ import { QuickNotesWidget } from "@/components/quickNotesWidget"
 import { StudySoundsWidget } from "@/components/studySoundsWidget"
 import { WeatherWidget } from "@/components/weatherWidget"
 import { Pomodoro } from "@/components/newPomodoroTimer"
+import { TodoWidget } from "@/components/toDoListWidget"
 import { Sparkles, ArrowUpRight, Instagram, Twitter, Youtube, Mail } from "lucide-react"
 
 export default function StudiioHomepage() {
@@ -112,6 +113,9 @@ export default function StudiioHomepage() {
           {/* Row 4 */}
           <div className="h-96 md:col-span-2 lg:col-span-2 xl:col-span-2">
             <LinksWidget />
+          </div>
+          <div className="h-96 md:col-span-2 lg:col-span-2 xl:col-span-2">
+            <TodoWidget />
           </div>
         </div>
 

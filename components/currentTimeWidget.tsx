@@ -18,19 +18,20 @@ export function CurrentTimeWidget() {
       className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1"
       style={{ height: "200%", justifyContent: "flex-start" }}
     >
-    <div
-      className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1"
-      style={{ height: "200%", justifyContent: "flex-start" }}
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <Clock className="w-4 h-4 text-accent-white" />
-        <span className="text-gray-300 text-sm font-medium">Time</span>
-      </div>
-      <div className="text-xl font-bold text-white">
-        {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-      </div>
-      <div className="text-gray-400 text-xs">
-        {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
+      <div
+        className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1"
+        style={{ height: "200%", justifyContent: "flex-start" }}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <Clock className="w-4 h-4 text-accent-white" />
+          <span className="text-gray-300 text-sm font-medium">Time</span>
+        </div>
+        <div className="text-xl font-bold text-white">
+          {currentTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+        </div>
+        <div className="text-gray-400 text-xs">
+          {currentTime.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}
+        </div>
       </div>
     </div>
   )
