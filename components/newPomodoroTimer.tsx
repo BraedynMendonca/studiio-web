@@ -99,7 +99,7 @@ export function Pomodoro() {
     }
 
   return (
-    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 md:col-span-2 lg:col-span-1 flex flex-col justify-center shadow-lg widget-hover">
+    <div className="glass-card rounded-2xl p-4 md:col-span-2 lg:col-span-1 flex flex-col justify-center widget-hover">
     <div className="flex items-center gap-2 mb-1">
         <Timer className="w-4 h-4 text-gray-300" />
         <span className="text-gray-300 text-sm font-medium">Pomodoro</span>

@@ -127,7 +127,10 @@ export function SocratesChatbot() {
   }
 
   return (
-    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover flex-1" style={{ height:'100%', justifyContent:'flex-start' }}>
+    <div
+      className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1"
+      style={{ height: "100%", justifyContent: "flex-start" }}
+    >
       <div className="flex items-center gap-2 mb-3">
         <MessageCircle className="w-4 h-4 text-accent-white" />
         <span className="text-gray-300 text-sm font-medium">Socrates AI</span>

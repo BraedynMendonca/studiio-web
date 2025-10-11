@@ -274,7 +274,7 @@ function ClientOnlyLinksWidget() {
   // Don't render anything on the server
   if (!isMounted) {
     return (
-      <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col h-full shadow-lg widget-hover min-h-[200px] animate-pulse">
+      <div className="glass-card rounded-2xl p-4 flex flex-col h-full widget-hover min-h-[200px] animate-pulse">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-4 h-4 bg-gray-700 rounded"></div>
           <div className="h-4 w-32 bg-gray-700 rounded"></div>
@@ -284,7 +284,7 @@ function ClientOnlyLinksWidget() {
   }
 
   return (
-    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col h-full shadow-lg widget-hover">
+    <div className="glass-card rounded-2xl p-4 flex flex-col h-full widget-hover">
       <div className="flex items-center gap-2 mb-4">
         <LayoutList className="w-4 h-4 text-accent-white" />
         <span className="text-gray-300 text-sm font-medium">Links & Resources</span>
@@ -370,7 +370,7 @@ export function LinksWidget() {
 
   if (!isClient) {
     return (
-      <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col h-full shadow-lg widget-hover min-h-[200px] animate-pulse">
+      <div className="glass-card rounded-2xl p-4 flex flex-col h-full widget-hover min-h-[200px] animate-pulse">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-4 h-4 bg-gray-700 rounded"></div>
           <div className="h-4 w-32 bg-gray-700 rounded"></div>
