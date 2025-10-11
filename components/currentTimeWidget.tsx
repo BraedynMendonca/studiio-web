@@ -16,7 +16,7 @@ export function CurrentTimeWidget() {
   return (
     <div
       className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1"
-      style={{ height: "100%", justifyContent: "flex-start" }}
+      style={{ height: "200%", justifyContent: "flex-start" }}
     >
       <div className="flex items-center gap-2 mb-2">
         <Clock className="w-4 h-4 text-accent-white" />
