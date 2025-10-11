@@ -5,7 +5,7 @@ import { Cloud, Sun } from "lucide-react"
 
 export function TemplateWidget() {
   return (
-    <div className="bg-card backdrop-blur border border-border rounded-2xl p-4 flex flex-col justify-center shadow-lg widget-hover">
+    <div className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Cloud className="w-4 h-4 text-accent-white" />
