@@ -13,9 +13,11 @@ import { QuickNotesWidget } from "@/components/quickNotesWidget"
 import { StudySoundsWidget } from "@/components/studySoundsWidget"
 import { WeatherWidget } from "@/components/weatherWidget"
 import { Pomodoro } from "@/components/newPomodoroTimer"
+import { Sparkles, ArrowUpRight, Instagram, Twitter, Youtube, Mail } from "lucide-react"
 
 export default function StudiioHomepage() {
   const [mounted, setMounted] = useState(false)
+  const currentYear = new Date().getFullYear()
 
   useEffect(() => {
     setMounted(true)
@@ -112,6 +114,94 @@ export default function StudiioHomepage() {
             <LinksWidget />
           </div>
         </div>
+
+        <footer className="glass-footer mt-10">
+          <div className="glass-footer__inner">
+            <div className="glass-footer__brand">
+              <span className="glass-footer__badge" aria-hidden="true">
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="glass-footer__title">Studiio</p>
+                <p className="glass-footer__subtitle">Ambient focus for every study session.</p>
+              </div>
+            </div>
+
+            <nav className="glass-footer__nav" aria-label="Footer navigation">
+              <a className="glass-footer__link" href="#app-container">
+                Overview
+              </a>
+              <a className="glass-footer__link" href="https://studiio.app/themes" target="_blank" rel="noreferrer">
+                Themes
+              </a>
+              <a className="glass-footer__link" href="https://studiio.app/community" target="_blank" rel="noreferrer">
+                Community
+              </a>
+            </nav>
+
+            <a
+              className="glass-footer__cta"
+              href="https://studiio.app/beta"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Join the beta
+              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+
+            <div className="glass-footer__social" aria-label="Social media">
+              <a
+                className="glass-footer__social-link"
+                href="https://instagram.com/studiioapp"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Studiio on Instagram"
+              >
+                <Instagram className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <a
+                className="glass-footer__social-link"
+                href="https://x.com/studiioapp"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Studiio on X"
+              >
+                <Twitter className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <a
+                className="glass-footer__social-link"
+                href="https://youtube.com/@studiioapp"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Studiio on YouTube"
+              >
+                <Youtube className="h-4 w-4" aria-hidden="true" />
+              </a>
+              <a
+                className="glass-footer__social-link"
+                href="mailto:hello@studiio.app"
+                aria-label="Email Studiio"
+              >
+                <Mail className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+
+          <div className="glass-footer__bottom">
+            <p className="glass-footer__fine-print">© {currentYear} Studiio Labs</p>
+            <div className="glass-footer__legal">
+              <a className="glass-footer__link" href="https://studiio.app/privacy" target="_blank" rel="noreferrer">
+                Privacy
+              </a>
+              <a className="glass-footer__link" href="https://studiio.app/terms" target="_blank" rel="noreferrer">
+                Terms
+              </a>
+              <a className="glass-footer__link" href="mailto:press@studiio.app">
+                Press
+              </a>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   )

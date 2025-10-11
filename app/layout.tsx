@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "Studiio - Your Complete Study Hub",
   description: "Stay focused, stay organized with Studiio's comprehensive study tools",
   generator: "v0.app",
+  icons: {
+    icon: "/favicon.svg",
+  },
 }
 
 // Force dynamic rendering to prevent hydration issues
