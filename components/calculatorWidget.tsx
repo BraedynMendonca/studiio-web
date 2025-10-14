@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calculator } from "lucide-react"
 
 export function CalculatorWidget() {
@@ -9,11 +9,51 @@ export function CalculatorWidget() {
   const [calcOperation, setCalcOperation] = useState<string | null>(null)
   const [calcWaitingForOperand, setCalcWaitingForOperand] = useState(false)
 
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const key = event.key
+
+      // Handle number keys
+      if (/^[0-9]$/.test(key)) {
+        inputNumber(key)
+      }
+      // Handle decimal point
+      else if (key === ".") {
+        inputNumber(".")
+      }
+      // Handle operators
+      else if (key === "+" || key === "-" || key === "*" || key === "/") {
+        inputOperation(key)
+      }
+      // Handle Enter for equals
+      else if (key === "Enter" || key === "=") {
+        event.preventDefault()
+        performCalculation()
+      }
+      // Handle Escape or C for clear
+      else if (key === "Escape" || key === "c" || key === "C") {
+        clearCalculator()
+      }
+      // Handle Backspace
+      else if (key === "Backspace") {
+        if (calcDisplay.length > 1) {
+          setCalcDisplay(calcDisplay.slice(0, -1))
+        } else {
+          setCalcDisplay("0")
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyPress)
+    return () => window.removeEventListener("keydown", handleKeyPress)
+  }, [calcDisplay, calcPrevValue, calcOperation, calcWaitingForOperand])
+
   const inputNumber = (num: string) => {
     if (calcWaitingForOperand) {
       setCalcDisplay(String(num))
       setCalcWaitingForOperand(false)
     } else {
+      if (num === "." && calcDisplay.includes(".")) return
       setCalcDisplay(calcDisplay === "0" ? String(num) : calcDisplay + num)
     }
   }
@@ -84,6 +124,7 @@ export function CalculatorWidget() {
         <div className="bg-input-bg border border-input-border rounded-xl p-2 mb-2">
           <div className="text-right text-white text-sm font-mono truncate">{calcDisplay}</div>
         </div>
+        <div className="text-xs text-gray-400 mb-2 text-center">Use your keyboard or click buttons</div>
         <div className="grid grid-cols-4 gap-1 h-full grid-rows-5">
           <button
             onClick={clearCalculator}

@@ -13,7 +13,6 @@ import { QuickNotesWidget } from "@/components/quickNotesWidget"
 import { StudySoundsWidget } from "@/components/studySoundsWidget"
 import { WeatherWidget } from "@/components/weatherWidget"
 import { Pomodoro } from "@/components/newPomodoroTimer"
-import { TodoWidget } from "@/components/toDoListWidget"
 import { Sparkles, ArrowUpRight, Instagram, Twitter, Youtube, Mail } from "lucide-react"
 
 export default function StudiioHomepage() {
@@ -70,9 +69,9 @@ export default function StudiioHomepage() {
         </div>
 
         {/* Widget Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-min">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-min mb-8">
           {/* Row 1 */}
-          <div className="h-24">
+          <div className="h-32">
             <CurrentTimeWidget />
           </div>
           <div className="h-48 md:col-span-1 lg:col-span-1">
@@ -103,10 +102,10 @@ export default function StudiioHomepage() {
           <div className="h-96 md:col-span-1 lg:col-span-1 xl:col-span-1 md:row-span-2">
             <CalculatorWidget />
           </div>
-          <div className="h-48">
+          <div className="h-64">
             <InspirationQuote />
           </div>
-          <div className="h-48">
+          <div className="h-96 flex items-end">
             <ColorPaletteSelector />
           </div>
 
@@ -114,93 +113,92 @@ export default function StudiioHomepage() {
           <div className="h-96 md:col-span-2 lg:col-span-2 xl:col-span-2">
             <LinksWidget />
           </div>
-          <div className="h-96 md:col-span-2 lg:col-span-2 xl:col-span-2">
-            <TodoWidget />
-          </div>
         </div>
 
-        <footer className="glass-footer mt-10">
-          <div className="glass-footer__inner">
+        {/* Footer */}
+        <footer className="glass-footer">
+          <div className="glass-footer__content">
+            {/* Left: Brand */}
             <div className="glass-footer__brand">
-              <span className="glass-footer__badge" aria-hidden="true">
-                <Sparkles className="h-4 w-4" aria-hidden="true" />
-              </span>
+              <div className="glass-footer__logo">
+                <Sparkles className="w-5 h-5" />
+              </div>
               <div>
-                <p className="glass-footer__title">Studiio</p>
+                <h3 className="glass-footer__title">STUDIIO</h3>
                 <p className="glass-footer__subtitle">Ambient focus for every study session.</p>
               </div>
             </div>
 
-            <nav className="glass-footer__nav" aria-label="Footer navigation">
-              <a className="glass-footer__link" href="#app-container">
+            {/* Center: Navigation */}
+            <nav className="glass-footer__nav">
+              <a href="#overview" className="glass-footer__link">
                 Overview
               </a>
-              <a className="glass-footer__link" href="https://studiio.app/themes" target="_blank" rel="noreferrer">
+              <a href="#themes" className="glass-footer__link">
                 Themes
               </a>
-              <a className="glass-footer__link" href="https://studiio.app/community" target="_blank" rel="noreferrer">
+              <a href="#community" className="glass-footer__link">
                 Community
               </a>
             </nav>
 
-            <a
-              className="glass-footer__cta"
-              href="https://studiio.app/beta"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Join the beta
-              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-            </a>
-
-            <div className="glass-footer__social" aria-label="Social media">
+            {/* Right: CTA and Social */}
+            <div className="glass-footer__actions">
               <a
-                className="glass-footer__social-link"
-                href="https://instagram.com/studiioapp"
+                href="https://studiio.app/beta"
                 target="_blank"
-                rel="noreferrer"
-                aria-label="Studiio on Instagram"
+                rel="noopener noreferrer"
+                className="glass-footer__cta"
               >
-                <Instagram className="h-4 w-4" aria-hidden="true" />
+                Join the beta
+                <ArrowUpRight className="w-4 h-4" />
               </a>
-              <a
-                className="glass-footer__social-link"
-                href="https://x.com/studiioapp"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Studiio on X"
-              >
-                <Twitter className="h-4 w-4" aria-hidden="true" />
-              </a>
-              <a
-                className="glass-footer__social-link"
-                href="https://youtube.com/@studiioapp"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Studiio on YouTube"
-              >
-                <Youtube className="h-4 w-4" aria-hidden="true" />
-              </a>
-              <a
-                className="glass-footer__social-link"
-                href="mailto:hello@studiio.app"
-                aria-label="Email Studiio"
-              >
-                <Mail className="h-4 w-4" aria-hidden="true" />
-              </a>
+              <div className="glass-footer__social">
+                <a
+                  href="https://instagram.com/studiioapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-footer__social-link"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://x.com/studiioapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-footer__social-link"
+                  aria-label="X (Twitter)"
+                >
+                  <Twitter className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://youtube.com/@studiioapp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-footer__social-link"
+                  aria-label="YouTube"
+                >
+                  <Youtube className="w-4 h-4" />
+                </a>
+                <a href="mailto:hello@studiio.app" className="glass-footer__social-link" aria-label="Email">
+                  <Mail className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
 
+          {/* Bottom: Copyright and Legal */}
           <div className="glass-footer__bottom">
-            <p className="glass-footer__fine-print">© {currentYear} Studiio Labs</p>
+            <p className="glass-footer__copyright">© {currentYear} Studiio Labs</p>
             <div className="glass-footer__legal">
-              <a className="glass-footer__link" href="https://studiio.app/privacy" target="_blank" rel="noreferrer">
+              <a href="https://studiio.app/privacy" className="glass-footer__link">
                 Privacy
               </a>
-              <a className="glass-footer__link" href="https://studiio.app/terms" target="_blank" rel="noreferrer">
+              <a href="https://studiio.app/terms" className="glass-footer__link">
                 Terms
               </a>
-              <a className="glass-footer__link" href="mailto:press@studiio.app">
+              <a href="mailto:press@studiio.app" className="glass-footer__link">
                 Press
               </a>
             </div>
