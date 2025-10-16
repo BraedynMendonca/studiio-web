@@ -190,7 +190,7 @@ export default function StudiioHomepage() {
 
           {/* Bottom: Copyright and Legal */}
           <div className="glass-footer__bottom">
-            <p className="glass-footer__copyright">© {currentYear} Studiio Labs</p>
+            <p className="glass-footer__copyright">© {currentYear} studiio.xyz</p>
             <div className="glass-footer__legal">
               <a href="https://studiio.xyz" className="glass-footer__link">
                 Privacy
