@@ -1,25 +1,41 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Palette } from "lucide-react"
+import { Palette, Plus } from "lucide-react"
 
-const themes = [
+interface Theme {
+  name: string;
+  class: string;
+  color: string;
+  isCustom?: boolean;
+}
+
+const themes: Theme[] = [
   { name: "Default", class: "theme-default", color: "#ffffff" },
-  { name: "Blue", class: "theme-blue", color: "#3b82f6" },
-  { name: "Purple", class: "theme-purple", color: "#9333ea" },
-  { name: "Green", class: "theme-green", color: "#22c55e" },
-  { name: "Red", class: "theme-red", color: "#ef4444" },
+  { name: "Ocean", class: "theme-blue", color: "#3b82f6" },
+  { name: "Lavender", class: "theme-purple", color: "#9333ea" },
+  { name: "Forest", class: "theme-green", color: "#22c55e" },
+  { name: "Cherry", class: "theme-red", color: "#ef4444" },
+  { name: "Custom", class: "theme-custom", color: "#ffffff", isCustom: true },
 ]
 
 export function PersonalizationWidget() {
   const [selectedTheme, setSelectedTheme] = useState("theme-default")
+  const [customColor, setCustomColor] = useState("#ffffff")
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("studiio-theme")
+    const savedCustomColor = localStorage.getItem("studiio-custom-color")
+
     if (savedTheme && themes.some(theme => theme.class === savedTheme)) {
       setSelectedTheme(savedTheme)
-      applyTheme(savedTheme)
+      if (savedTheme === "theme-custom" && savedCustomColor) {
+        setCustomColor(savedCustomColor)
+        handleThemeChange(savedTheme, savedCustomColor)
+      } else {
+        applyTheme(savedTheme)
+      }
     } else {
       // If no valid theme is saved, set and apply the default theme
       const defaultTheme = "theme-default"
@@ -43,11 +59,37 @@ export function PersonalizationWidget() {
     }
   }
 
-  const handleThemeChange = (themeClass: string) => {
+  const handleThemeChange = (themeClass: string, customColorValue?: string) => {
     if (typeof window === "undefined") return
     setSelectedTheme(themeClass)
-    applyTheme(themeClass)
+
+    if (themeClass === "theme-custom" && customColorValue) {
+      setCustomColor(customColorValue)
+      const container = document.getElementById("app-container")
+      if (container) {
+        // Remove all theme classes
+        themes.forEach((theme) => {
+          container.classList.remove(theme.class)
+        })
+        container.classList.add(themeClass)
+        container.style.setProperty("--custom-theme-color", customColorValue)
+      }
+    } else {
+      applyTheme(themeClass)
+    }
+
     localStorage.setItem("studiio-theme", themeClass)
+    if (customColorValue) {
+      localStorage.setItem("studiio-custom-color", customColorValue)
+    }
+  }
+
+  const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value
+    setCustomColor(newColor)
+    if (selectedTheme === "theme-custom") {
+      handleThemeChange("theme-custom", newColor)
+    }
   }
 
   return (
@@ -57,11 +99,33 @@ export function PersonalizationWidget() {
     >
       <div className="flex items-center gap-2 mb-3">
         <Palette className="w-4 h-4 text-accent-white" />
-        <span className="text-gray-300 text-sm font-medium">Theme</span>
+        <span className="text-gray-300 text-sm font-medium">Personalization</span>
       </div>
 
-      <div className="grid grid-cols-5 gap-2">
-        {themes.map((theme) => (
+      <div className="flex gap-3 justify-center items-center">
+        {themes.map((theme) => theme.isCustom ? (
+          <div key={theme.class} className="relative">
+            <div className="w-8 h-8 rounded-full relative">
+              <input
+                type="color"
+                value={customColor}
+                onChange={(e) => {
+                  handleCustomColorChange(e);
+                  handleThemeChange('theme-custom', e.target.value);
+                }}
+                className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
+                title="Choose custom color"
+              />
+              <div
+                className={`absolute inset-0 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${selectedTheme === theme.class ? "border-white scale-110" : "border-gray-600 hover:border-gray-400"
+                  }`}
+                style={{ backgroundColor: selectedTheme === 'theme-custom' ? customColor : theme.color }}
+              >
+                <Plus className="w-4 h-4 text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]" />
+              </div>
+            </div>
+          </div>
+        ) : (
           <button
             key={theme.class}
             onClick={() => handleThemeChange(theme.class)}
