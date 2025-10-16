@@ -105,7 +105,7 @@ export default function StudiioHomepage() {
           <div className="h-64">
             <InspirationQuote />
           </div>
-          <div className="h-96 flex items-end">
+          <div className="h-96 flex items-end pb-[100px]">
             <ColorPaletteSelector />
           </div>
 
@@ -145,7 +145,7 @@ export default function StudiioHomepage() {
             {/* Right: CTA and Social */}
             <div className="glass-footer__actions">
               <a
-                href="https://studiio.app/beta"
+                href="https://forms.gle/UHfRJfwXpUadfa4f7"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="glass-footer__cta"
@@ -155,7 +155,7 @@ export default function StudiioHomepage() {
               </a>
               <div className="glass-footer__social">
                 <a
-                  href="https://instagram.com/studiioapp"
+                  href="https://www.instagram.com/studiio_official/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="glass-footer__social-link"
@@ -164,7 +164,7 @@ export default function StudiioHomepage() {
                   <Instagram className="w-4 h-4" />
                 </a>
                 <a
-                  href="https://x.com/studiioapp"
+                  href="studiio.xyz"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="glass-footer__social-link"
@@ -173,7 +173,7 @@ export default function StudiioHomepage() {
                   <Twitter className="w-4 h-4" />
                 </a>
                 <a
-                  href="https://youtube.com/@studiioapp"
+                  href="studiio.xyz"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="glass-footer__social-link"
@@ -181,7 +181,7 @@ export default function StudiioHomepage() {
                 >
                   <Youtube className="w-4 h-4" />
                 </a>
-                <a href="mailto:hello@studiio.app" className="glass-footer__social-link" aria-label="Email">
+                <a href="mailto:studiioxyz@gmail.com" className="glass-footer__social-link" aria-label="Email">
                   <Mail className="w-4 h-4" />
                 </a>
               </div>
@@ -192,13 +192,13 @@ export default function StudiioHomepage() {
           <div className="glass-footer__bottom">
             <p className="glass-footer__copyright">© {currentYear} Studiio Labs</p>
             <div className="glass-footer__legal">
-              <a href="https://studiio.app/privacy" className="glass-footer__link">
+              <a href="https://studiio.xyz" className="glass-footer__link">
                 Privacy
               </a>
-              <a href="https://studiio.app/terms" className="glass-footer__link">
+              <a href="https://studiio.xyz" className="glass-footer__link">
                 Terms
               </a>
-              <a href="mailto:press@studiio.app" className="glass-footer__link">
+              <a href="mailto:studiioxyz@gmail.com" className="glass-footer__link">
                 Press
               </a>
             </div>
