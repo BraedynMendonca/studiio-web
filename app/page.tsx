@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { SocratesChatbot } from "@/components/socrates-chatbot"
 import { InspirationQuote } from "@/components/inspiration-quote"
-import { ColorPaletteSelector } from "@/components/ColorThemePicker"
+import { PersonalizationWidget } from "@/components/personalizationWidget"
 import { BreakTimer } from "@/components/breakTimer"
 import { CalculatorWidget } from "@/components/calculatorWidget"
 import { CurrentTimeWidget } from "@/components/currentTimeWidget"
@@ -107,7 +107,7 @@ export default function StudiioHomepage() {
             <InspirationQuote />
           </div>
           <div className="h-48">
-            <ColorPaletteSelector />
+            <PersonalizationWidget />
           </div>
 
           {/* Row 4 */}

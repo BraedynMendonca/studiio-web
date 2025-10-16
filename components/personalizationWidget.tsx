@@ -11,22 +11,27 @@ const themes = [
   { name: "Red", class: "theme-red", color: "#ef4444" },
 ]
 
-export function ColorPaletteSelector() {
+export function PersonalizationWidget() {
   const [selectedTheme, setSelectedTheme] = useState("theme-default")
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-    // Load saved theme from localStorage only after component mounts
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("studiio-theme") || "theme-default"
+    const savedTheme = localStorage.getItem("studiio-theme")
+    if (savedTheme && themes.some(theme => theme.class === savedTheme)) {
       setSelectedTheme(savedTheme)
       applyTheme(savedTheme)
+    } else {
+      // If no valid theme is saved, set and apply the default theme
+      const defaultTheme = "theme-default"
+      setSelectedTheme(defaultTheme)
+      applyTheme(defaultTheme)
+      localStorage.setItem("studiio-theme", defaultTheme)
     }
+    setMounted(true)
   }, [])
 
   const applyTheme = (themeClass: string) => {
-    if (!mounted || typeof window === "undefined") return
+    if (typeof window === "undefined") return
     const container = document.getElementById("app-container")
     if (container) {
       // Remove all theme classes
@@ -39,7 +44,7 @@ export function ColorPaletteSelector() {
   }
 
   const handleThemeChange = (themeClass: string) => {
-    if (!mounted || typeof window === "undefined") return
+    if (typeof window === "undefined") return
     setSelectedTheme(themeClass)
     applyTheme(themeClass)
     localStorage.setItem("studiio-theme", themeClass)
@@ -60,9 +65,8 @@ export function ColorPaletteSelector() {
           <button
             key={theme.class}
             onClick={() => handleThemeChange(theme.class)}
-            className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
-              selectedTheme === theme.class ? "border-white scale-110" : "border-gray-600 hover:border-gray-400"
-            }`}
+            className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${selectedTheme === theme.class ? "border-white scale-110" : "border-gray-600 hover:border-gray-400"
+              }`}
             style={{ backgroundColor: theme.color }}
             title={theme.name}
           />
