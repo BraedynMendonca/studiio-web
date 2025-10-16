@@ -48,7 +48,7 @@ export function ColorPaletteSelector() {
   return (
     <div
       className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1"
-      style={{ height: "60%", justifyContent: "flex-start", marginTop: "-100px" }}
+      style={{ height: "100%", justifyContent: "flex-start" }}
     >
       <div className="flex items-center gap-2 mb-3">
         <Palette className="w-4 h-4 text-accent-white" />

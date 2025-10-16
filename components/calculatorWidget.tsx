@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Calculator } from "lucide-react"
 
 export function CalculatorWidget() {
@@ -8,9 +8,14 @@ export function CalculatorWidget() {
   const [calcPrevValue, setCalcPrevValue] = useState<number | null>(null)
   const [calcOperation, setCalcOperation] = useState<string | null>(null)
   const [calcWaitingForOperand, setCalcWaitingForOperand] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
+  const calculatorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
+      // Only handle keyboard input if calculator is focused
+      if (!isFocused) return
+
       const key = event.key
 
       // Handle number keys
@@ -44,9 +49,24 @@ export function CalculatorWidget() {
       }
     }
 
+    const handleClickOutside = (event: MouseEvent) => {
+      if (calculatorRef.current && !calculatorRef.current.contains(event.target as Node)) {
+        setIsFocused(false)
+      }
+    }
+
     window.addEventListener("keydown", handleKeyPress)
-    return () => window.removeEventListener("keydown", handleKeyPress)
-  }, [calcDisplay, calcPrevValue, calcOperation, calcWaitingForOperand])
+    document.addEventListener("mousedown", handleClickOutside)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress)
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [calcDisplay, calcPrevValue, calcOperation, calcWaitingForOperand, isFocused])
+
+  const handleCalculatorClick = () => {
+    setIsFocused(true)
+  }
 
   const inputNumber = (num: string) => {
     if (calcWaitingForOperand) {
@@ -113,18 +133,28 @@ export function CalculatorWidget() {
 
   return (
     <div
-      className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1"
-      style={{ height: "100%", justifyContent: "flex-start" }}
+      ref={calculatorRef}
+      onClick={handleCalculatorClick}
+      className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1 cursor-pointer"
+      style={{
+        height: "105%",
+        justifyContent: "flex-start",
+        outline: isFocused ? "2px solid rgba(59, 130, 246, 0.5)" : "none",
+        outlineOffset: "-2px",
+      }}
     >
       <div className="flex items-center gap-2 mb-3">
         <Calculator className="w-4 h-4 text-accent-white" />
         <span className="text-gray-300 text-sm font-medium">Calculator</span>
+        {isFocused && <span className="ml-auto text-xs text-blue-400">Active</span>}
       </div>
       <div className="flex-1 flex flex-col">
         <div className="bg-input-bg border border-input-border rounded-xl p-2 mb-2">
           <div className="text-right text-white text-sm font-mono truncate">{calcDisplay}</div>
         </div>
-        <div className="text-xs text-gray-400 mb-2 text-center">Use your keyboard or click buttons</div>
+        <div className="text-xs text-gray-400 mb-2 text-center">
+          {isFocused ? "Keyboard active - Type to calculate" : "Click to enable keyboard"}
+        </div>
         <div className="grid grid-cols-4 gap-1 h-full grid-rows-5">
           <button
             onClick={clearCalculator}
