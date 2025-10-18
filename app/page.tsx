@@ -15,10 +15,15 @@ import { WeatherWidget } from "@/components/weatherWidget"
 import { Pomodoro } from "@/components/newPomodoroTimer"
 import { TodoWidget } from "@/components/toDoListWidget"
 import { Sparkles, ArrowUpRight, Instagram, Twitter, Youtube, Mail } from "lucide-react"
+import { ThemedLiquidEther } from "@/components/backgrounds/ThemedLiquidEther";
+
+import { useThemeStore } from "@/lib/themeStore";
 
 export default function StudiioHomepage() {
   const [mounted, setMounted] = useState(false)
   const currentYear = new Date().getFullYear()
+  const background = useThemeStore((state) => state.background)
+  const color = useThemeStore((state) => state.color)
 
   useEffect(() => {
     setMounted(true)
@@ -36,8 +41,10 @@ export default function StudiioHomepage() {
   }
 
   return (
-    <div id="app-container" className="min-h-screen transition-colors duration-300 pt-6 pb-6">
-      <div className="stars" />
+    <div id="app-container" className="min-h-screen transition-colors duration-300 pt-6 pb-6" style={{ backgroundColor: background === 'solid-color' ? color : 'transparent' }}>
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
+        {background === 'liquid-ether' && <ThemedLiquidEther />}
+      </div>
       <div className="max-w-7xl mx-auto flex flex-col relative z-10 px-4">
         {/* Header with ProductHunt badge and title */}
         <div className="flex items-center justify-between mb-6 relative">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Palette, Plus } from "lucide-react"
+import { useThemeStore } from "@/lib/themeStore"
 
 interface Theme {
   name: string;
@@ -23,10 +24,18 @@ export function PersonalizationWidget() {
   const [selectedTheme, setSelectedTheme] = useState("theme-default")
   const [customColor, setCustomColor] = useState("#ffffff")
   const [mounted, setMounted] = useState(false)
+  const setColor = useThemeStore((state) => state.setColor)
+  const setBackground = useThemeStore((state) => state.setBackground)
+  const background = useThemeStore((state) => state.background)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("studiio-theme")
     const savedCustomColor = localStorage.getItem("studiio-custom-color")
+    const savedBackground = localStorage.getItem("studiio-background")
+
+    if (savedBackground) {
+      setBackground(savedBackground)
+    }
 
     if (savedTheme && themes.some(theme => theme.class === savedTheme)) {
       setSelectedTheme(savedTheme)
@@ -34,12 +43,17 @@ export function PersonalizationWidget() {
         setCustomColor(savedCustomColor)
         handleThemeChange(savedTheme, savedCustomColor)
       } else {
-        applyTheme(savedTheme)
+        const theme = themes.find(t => t.class === savedTheme)
+        if (theme) {
+          setColor(theme.color)
+          applyTheme(savedTheme)
+        }
       }
     } else {
       // If no valid theme is saved, set and apply the default theme
       const defaultTheme = "theme-default"
       setSelectedTheme(defaultTheme)
+      setColor(themes.find(t => t.class === defaultTheme)!.color)
       applyTheme(defaultTheme)
       localStorage.setItem("studiio-theme", defaultTheme)
     }
@@ -65,6 +79,7 @@ export function PersonalizationWidget() {
 
     if (themeClass === "theme-custom" && customColorValue) {
       setCustomColor(customColorValue)
+      setColor(customColorValue)
       const container = document.getElementById("app-container")
       if (container) {
         // Remove all theme classes
@@ -75,6 +90,10 @@ export function PersonalizationWidget() {
         container.style.setProperty("--custom-theme-color", customColorValue)
       }
     } else {
+      const theme = themes.find(t => t.class === themeClass)
+      if (theme) {
+        setColor(theme.color)
+      }
       applyTheme(themeClass)
     }
 
@@ -87,6 +106,7 @@ export function PersonalizationWidget() {
   const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value
     setCustomColor(newColor)
+    setColor(newColor)
     if (selectedTheme === "theme-custom") {
       handleThemeChange("theme-custom", newColor)
     }
@@ -110,7 +130,6 @@ export function PersonalizationWidget() {
                 type="color"
                 value={customColor}
                 onChange={(e) => {
-                  handleCustomColorChange(e);
                   handleThemeChange('theme-custom', e.target.value);
                 }}
                 className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
@@ -129,8 +148,7 @@ export function PersonalizationWidget() {
           <button
             key={theme.class}
             onClick={() => handleThemeChange(theme.class)}
-            className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${selectedTheme === theme.class ? "border-white scale-110" : "border-gray-600 hover:border-gray-400"
-              }`}
+            className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${selectedTheme === theme.class ? "border-white scale-110" : "border-gray-600 hover:border-gray-400"}`}
             style={{ backgroundColor: theme.color }}
             title={theme.name}
           />
@@ -139,6 +157,19 @@ export function PersonalizationWidget() {
 
       <div className="text-xs text-gray-400 mt-2 text-center">
         {mounted ? themes.find((t) => t.class === selectedTheme)?.name : "Loading"} Theme
+      </div>
+
+      <div className="mt-4">
+        <label htmlFor="background-select" className="text-xs text-gray-400">Background</label>
+        <select
+          id="background-select"
+          value={background}
+          onChange={(e) => setBackground(e.target.value)}
+          className="w-full bg-gray-800 border border-gray-700 rounded-md p-1 text-xs text-white mt-1"
+        >
+          <option value="solid-color">Solid Color</option>
+          <option value="liquid-ether">Liquid Ether</option>
+        </select>
       </div>
     </div>
   )
