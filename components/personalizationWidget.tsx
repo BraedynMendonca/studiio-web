@@ -169,6 +169,7 @@ export function PersonalizationWidget() {
         >
           <option value="solid-color">Solid Color</option>
           <option value="liquid-ether">Liquid Ether</option>
+          <option value="gradient-blinds">Gradient Blinds</option>
         </select>
       </div>
     </div>
