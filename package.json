@@ -45,6 +45,7 @@
     "@radix-ui/react-tooltip": "1.1.6",
     "@remix-run/react": "latest",
     "@sveltejs/kit": "latest",
+    "@types/three": "^0.180.0",
     "@vercel/analytics": "latest",
     "autoprefixer": "^10.4.20",
     "class-variance-authority": "^0.7.1",
@@ -60,6 +61,7 @@
     "lucide-react": "^0.454.0",
     "next": "15.2.4",
     "next-themes": "latest",
+    "ogl": "^1.0.11",
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",
@@ -70,10 +72,12 @@
     "svelte": "latest",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.180.0",
     "vaul": "latest",
     "vue": "latest",
     "vue-router": "latest",
-    "zod": "^3.24.1"
+    "zod": "^3.24.1",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -83,6 +87,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "array-move": "^4.0.0",
+    "eslint": "^9.38.0",
+    "eslint-config-next": "15.5.6",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"

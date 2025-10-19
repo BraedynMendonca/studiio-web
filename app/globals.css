@@ -71,6 +71,7 @@ body {
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-200px);
   }
@@ -329,30 +330,36 @@ body {
 }
 
 @keyframes pulse-slow {
+
   0%,
   100% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 1;
   }
 }
 
 @keyframes pulse-medium {
+
   0%,
   100% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 0.9;
   }
 }
 
 @keyframes pulse-fast {
+
   0%,
   100% {
     opacity: 0.7;
   }
+
   50% {
     opacity: 1;
   }
@@ -479,6 +486,29 @@ body {
   --aurora-1: rgba(239, 68, 68, 0.32);
   --aurora-2: rgba(251, 113, 133, 0.26);
   --aurora-3: rgba(248, 113, 113, 0.22);
+}
+
+.theme-custom {
+  --custom-theme-color: #ffffff;
+  --bg-dark: linear-gradient(150deg, color-mix(in srgb, var(--custom-theme-color) 20%, #000000) 0%, color-mix(in srgb, var(--custom-theme-color) 10%, #000000) 100%);
+  --card-bg: color-mix(in srgb, var(--custom-theme-color) 12%, transparent);
+  --border-color: color-mix(in srgb, var(--custom-theme-color) 24%, transparent);
+  --input-bg: color-mix(in srgb, var(--custom-theme-color) 35%, rgba(0, 0, 0, 0.8));
+  --input-border: color-mix(in srgb, var(--custom-theme-color) 34%, transparent);
+  --button-bg: color-mix(in srgb, var(--custom-theme-color) 28%, transparent);
+  --button-hover-bg: color-mix(in srgb, var(--custom-theme-color) 40%, transparent);
+  --card-glass-from: rgba(255, 255, 255, 0.22);
+  --card-glass-to: color-mix(in srgb, var(--custom-theme-color) 12%, transparent);
+  --card-glass-highlight: color-mix(in srgb, var(--custom-theme-color) 60%, transparent);
+  --card-border-hover: color-mix(in srgb, var(--custom-theme-color) 65%, transparent);
+  --card-shadow-color: color-mix(in srgb, var(--custom-theme-color) 45%, rgba(0, 0, 0, 0.8));
+  --glass-border-base: color-mix(in srgb, var(--custom-theme-color) 36%, transparent);
+  --glass-border-hover: color-mix(in srgb, var(--custom-theme-color) 60%, transparent);
+  --glass-sheen: rgba(255, 255, 255, 0.65);
+  --card-glass-tint: color-mix(in srgb, var(--custom-theme-color) 16%, transparent);
+  --aurora-1: color-mix(in srgb, var(--custom-theme-color) 32%, transparent);
+  --aurora-2: color-mix(in srgb, var(--custom-theme-color) 26%, transparent);
+  --aurora-3: color-mix(in srgb, var(--custom-theme-color) 22%, transparent);
 }
 
 #app-container {
