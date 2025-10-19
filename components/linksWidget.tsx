@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { List, Trash2, GripVertical, Edit2, Save, X } from "lucide-react"
+import { LayoutList, Trash2, GripVertical, Edit2, Save, X } from "lucide-react"
 import { arrayMoveImmutable } from 'array-move';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -286,7 +286,7 @@ function ClientOnlyLinksWidget() {
   return (
     <div className="glass-card rounded-2xl p-4 flex flex-col h-full widget-hover">
       <div className="flex items-center gap-2 mb-4">
-        <List className="w-4 h-4 text-accent-white" />
+        <LayoutList className="w-4 h-4 text-accent-white" />
         <span className="text-gray-300 text-sm font-medium">Links & Resources</span>
         {links.length > 0 && (
           <span className="text-xs text-gray-500 ml-auto">
