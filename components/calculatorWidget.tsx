@@ -9,7 +9,40 @@ export function CalculatorWidget() {
   const [calcOperation, setCalcOperation] = useState<string | null>(null)
   const [calcWaitingForOperand, setCalcWaitingForOperand] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const calculatorRef = useRef<HTMLDivElement>(null)
+
+  // Load saved state from localStorage on mount
+  useEffect(() => {
+    setMounted(true)
+    if (typeof window !== "undefined") {
+      const savedState = localStorage.getItem("studiio-calculator")
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState)
+          setCalcDisplay(parsed.display || "0")
+          setCalcPrevValue(parsed.prevValue || null)
+          setCalcOperation(parsed.operation || null)
+          setCalcWaitingForOperand(parsed.waitingForOperand || false)
+        } catch (error) {
+          console.error("Error loading calculator state:", error)
+        }
+      }
+    }
+  }, [])
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      const state = {
+        display: calcDisplay,
+        prevValue: calcPrevValue,
+        operation: calcOperation,
+        waitingForOperand: calcWaitingForOperand,
+      }
+      localStorage.setItem("studiio-calculator", JSON.stringify(state))
+    }
+  }, [calcDisplay, calcPrevValue, calcOperation, calcWaitingForOperand, mounted])
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {

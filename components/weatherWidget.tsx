@@ -7,7 +7,7 @@ export function WeatherWidget() {
   const [temp, setTemp] = useState<string>("Loading...")
   const [condition, setCondition] = useState<string>("Loading weather...")
   const [city, setCity] = useState<string>("")
-  const [zip, setZip] = useState<string>("10002")
+  const [zip, setZip] = useState<string>("")
   const [mounted, setMounted] = useState(false)
   const [error, setError] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)

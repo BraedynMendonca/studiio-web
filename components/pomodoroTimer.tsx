@@ -10,6 +10,41 @@ export function PomodoroTimer() {
   const [sessionCount, setSessionCount] = useState(1)
   const [workDuration, setWorkDuration] = useState(25)
   const [breakDuration, setBreakDuration] = useState(5)
+  const [mounted, setMounted] = useState(false)
+
+  // Load saved state from localStorage on mount
+  useEffect(() => {
+    setMounted(true)
+    if (typeof window !== "undefined") {
+      const savedState = localStorage.getItem("studiio-pomodoro")
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState)
+          setTimeLeft(parsed.timeLeft || 25 * 60)
+          setIsBreak(parsed.isBreak || false)
+          setSessionCount(parsed.sessionCount || 1)
+          setWorkDuration(parsed.workDuration || 25)
+          setBreakDuration(parsed.breakDuration || 5)
+        } catch (error) {
+          console.error("Error loading pomodoro state:", error)
+        }
+      }
+    }
+  }, [])
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      const state = {
+        timeLeft,
+        isBreak,
+        sessionCount,
+        workDuration,
+        breakDuration,
+      }
+      localStorage.setItem("studiio-pomodoro", JSON.stringify(state))
+    }
+  }, [timeLeft, isBreak, sessionCount, workDuration, breakDuration, mounted])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -56,9 +91,7 @@ export function PomodoroTimer() {
         <span className="text-gray-300 text-sm font-medium">Pomodoro Timer</span>
       </div>
       <div className="text-center flex-1 flex flex-col justify-center">
-        <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">
-          {formatTime(timeLeft)}
-        </div>
+        <div className="text-3xl font-mono font-bold text-white mb-2 drop-shadow-lg">{formatTime(timeLeft)}</div>
         <div className="text-gray-400 text-xs mb-3">
           {isBreak ? "Break Time" : "Work Time"} • Session {sessionCount}
         </div>

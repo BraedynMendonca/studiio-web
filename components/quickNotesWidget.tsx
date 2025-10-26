@@ -1,11 +1,31 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { PenTool } from "lucide-react"
 
 export function QuickNotesWidget() {
   const [notes, setNotes] = useState("")
   const [wordCount, setWordCount] = useState(0)
+  const [mounted, setMounted] = useState(false)
+
+  // Load saved notes from localStorage on mount
+  useEffect(() => {
+    setMounted(true)
+    if (typeof window !== "undefined") {
+      const savedNotes = localStorage.getItem("studiio-notes")
+      if (savedNotes) {
+        setNotes(savedNotes)
+        setWordCount(savedNotes.split(/\s+/).filter((word) => word.length > 0).length)
+      }
+    }
+  }, [])
+
+  // Save notes to localStorage whenever they change
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      localStorage.setItem("studiio-notes", notes)
+    }
+  }, [notes, mounted])
 
   return (
     <div

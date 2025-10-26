@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Coffee, Play, Pause, Square } from "lucide-react"
+import { Coffee } from "lucide-react"
 
 export function BreakTimer() {
   const [breakTimeLeft, setBreakTimeLeft] = useState(5 * 60)
   const [isBreakRunning, setIsBreakRunning] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const breakActivities = [
     "Take 10 deep breaths",
@@ -15,6 +16,32 @@ export function BreakTimer() {
     "Look out the window",
     "Do 10 jumping jacks",
   ]
+
+  // Load saved state from localStorage on mount
+  useEffect(() => {
+    setMounted(true)
+    if (typeof window !== "undefined") {
+      const savedState = localStorage.getItem("studiio-break-timer")
+      if (savedState) {
+        try {
+          const parsed = JSON.parse(savedState)
+          setBreakTimeLeft(parsed.timeLeft || 5 * 60)
+        } catch (error) {
+          console.error("Error loading break timer state:", error)
+        }
+      }
+    }
+  }, [])
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      const state = {
+        timeLeft: breakTimeLeft,
+      }
+      localStorage.setItem("studiio-break-timer", JSON.stringify(state))
+    }
+  }, [breakTimeLeft, mounted])
 
   useEffect(() => {
     let interval: NodeJS.Timeout
