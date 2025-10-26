@@ -80,7 +80,7 @@ export default function StudiioHomepage() {
                 className="block hover:opacity-80 transition-opacity"
               >
                 <img
-                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1012236&theme=dark&t=1757179546827"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/1024px-HD_transparent_picture.png "
                   alt="Studiio - Personalized Study Dashboard for Students! | Product Hunt"
                   className="w-[200px] h-[43px] lg:w-[250px] lg:h-[54px]"
                   width="250"
