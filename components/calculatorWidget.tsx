@@ -170,7 +170,7 @@ export function CalculatorWidget() {
       onClick={handleCalculatorClick}
       className="glass-card rounded-2xl p-4 flex flex-col justify-center widget-hover flex-1 cursor-pointer"
       style={{
-        height: "105%",
+        height: "120%",
         justifyContent: "flex-start",
         outline: isFocused ? "2px solid rgba(59, 130, 246, 0.5)" : "none",
         outlineOffset: "-2px",
